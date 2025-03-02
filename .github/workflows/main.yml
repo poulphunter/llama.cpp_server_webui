@@ -36,6 +36,17 @@ jobs:
             SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
             echo "name=${SAFE_NAME}-b${BUILD_NUMBER}-${SHORT_HASH}" >> $GITHUB_OUTPUT
           fi
+      - name: Pack artifacts
+        id: pack_artifacts
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
+        run: |
+          zip -r source-${{ steps.tag.outputs.name }}.zip . -x *.git* /*node_modules/* .editorconfig /*dist/*
+      - name: Upload artifacts
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: source-${{ steps.tag.outputs.name }}.zip
+          name: source.zip
       #- name: Archive production artifacts
       #  uses: actions/upload-artifact@v4
       #  with:
@@ -43,18 +54,18 @@ jobs:
       #    path: |
       #      .
       #      !.git
-      - name: Source code
-        uses: thedoctor0/zip-release@0.7.5
-        with:
-          type: 'zip'
-          filename: 'source.zip'
-          directory: '.'
-          exclusions: '*.git* /*node_modules/* .editorconfig'
-      - name: Upload Release
-        uses: ncipollo/release-action@v1.12.0
-        with:
-          artifacts: "source.zip"
-          token: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Source code
+      #  uses: thedoctor0/zip-release@0.7.5
+      #  with:
+      #    type: 'zip'
+      #    filename: 'source.zip'
+      #    directory: '.'
+      #    exclusions: '*.git* /*node_modules/* .editorconfig'
+      #- name: Upload Release
+      #  uses: ncipollo/release-action@v1.12.0
+      #  with:
+      #    artifacts: "source.zip"
+      #    token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Node.js
         uses: actions/setup-node@v4
         with:
@@ -62,13 +73,25 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run build --if-present
-      - name: Zip Dist
-        uses: thedoctor0/zip-release@0.7.5
+      - name: Pack artifacts
+        id: pack_artifacts
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
+        run: |
+          cd dist
+          zip -r webapp-${{ steps.tag.outputs.name }}.zip . -x *.git* *.idea* /*node_modules/* .editorconfig
+      - name: Upload artifacts
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
+        uses: actions/upload-artifact@v4
         with:
-          type: 'zip'
-          filename: 'web_app.zip'
-          directory: './dist/'
-          exclusions: '*.git* /*node_modules/* .editorconfig'
+          path: webapp-${{ steps.tag.outputs.name }}.zip
+          name: webapp.zip
+      #- name: Zip Dist
+      #  uses: thedoctor0/zip-release@0.7.5
+      #  with:
+      #    type: 'zip'
+      #    filename: 'web_app.zip'
+      #    directory: './dist/'
+      #    exclusions: '*.git* /*node_modules/* .editorconfig'
       #- name: Archive production artifacts
       #  uses: actions/upload-artifact@v4
       #  with:
