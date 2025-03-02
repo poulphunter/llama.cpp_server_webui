@@ -36,14 +36,6 @@ jobs:
             SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
             echo "name=${SAFE_NAME}-b${BUILD_NUMBER}-${SHORT_HASH}" >> $GITHUB_OUTPUT
           fi
-      - name: release
-        uses: actions/create-release@v1
-        id: create_release
-        with:
-          draft: false
-          prerelease: false
-          release_name: ${{ steps.version.outputs.version }}
-          tag_name: $SHORT_HASH
       - name: Pack artifacts
         id: pack_artifacts
         if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
@@ -93,6 +85,10 @@ jobs:
         with:
           path: webapp-${{ steps.tag.outputs.name }}.zip
           name: webapp.zip
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: webapp-${{ steps.tag.outputs.name }}.zip
       #- name: Zip Dist
       #  uses: thedoctor0/zip-release@0.7.5
       #  with:
