@@ -38,11 +38,11 @@ jobs:
           fi
       - name: Pack artifacts
         id: pack_artifacts
-        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
         run: |
           zip -r source-${{ steps.tag.outputs.name }}.zip . -x *.git* /*node_modules/* .editorconfig /*dist/*
       - name: Upload artifacts
-        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           path: source-${{ steps.tag.outputs.name }}.zip
@@ -75,12 +75,12 @@ jobs:
       - run: npm run build --if-present
       - name: Pack artifacts2
         id: pack_artifacts2
-        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
         run: |
           cd dist
           zip -r webapp-${{ steps.tag.outputs.name }}.zip . -x *.git* *.idea* /*node_modules/* .editorconfig
       - name: Upload artifacts2
-        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           path: webapp-${{ steps.tag.outputs.name }}.zip
