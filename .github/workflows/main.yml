@@ -17,13 +17,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: source_code
-          path: |
-            .
-            !.git
+      #- name: Archive production artifacts
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: source_code
+      #    path: |
+      #      .
+      #      !.git
       - name: Source code
         uses: thedoctor0/zip-release@0.7.5
         with:
@@ -31,6 +31,11 @@ jobs:
           filename: 'source.zip'
           directory: '.'
           exclusions: '*.git* /*node_modules/* .editorconfig'
+      - name: Upload Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          artifacts: "source.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Node.js
         uses: actions/setup-node@v4
         with:
