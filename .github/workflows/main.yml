@@ -24,6 +24,7 @@ jobs:
           fetch-depth: '0'
       - name: Generate Git Tag
         id: generate_tag
+        shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
         run: |
           VERSION_PREFIX="v"
           VERSION_MAJOR_MINOR="0.1"
@@ -38,6 +39,7 @@ jobs:
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
 
       - name: Push Git Tag
+        shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@users.noreply.github.com"
