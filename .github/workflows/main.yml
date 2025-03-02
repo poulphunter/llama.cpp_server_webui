@@ -51,12 +51,13 @@ jobs:
         run: |
           cd dist
           zip -r ../webapp-${{ steps.tag.outputs.name }}.zip . -x *.git* *.idea* /*node_modules/* .editorconfig
-      - name: Upload artifacts
-        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          path: webapp-${{ steps.tag.outputs.name }}.zip
-          name: webapp.zip
+          cp ../webapp-${{ steps.tag.outputs.name }}.zip ../webapp.zip
+      #- name: Upload artifacts
+      #  if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    path: webapp-${{ steps.tag.outputs.name }}.zip
+      #    name: webapp.zip
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -74,4 +75,4 @@ jobs:
           prerelease: false
           title: "Web App"
           files: |
-            webapp-${{ steps.tag.outputs.name }}.zip
+            webapp.zip
