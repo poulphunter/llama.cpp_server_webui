@@ -36,25 +36,17 @@ jobs:
             SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
             echo "name=${SAFE_NAME}-b${BUILD_NUMBER}-${SHORT_HASH}" >> $GITHUB_OUTPUT
           fi
-      - name: Pack artifacts
-        id: pack_artifacts
-        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
-        run: |
-          zip -r source-${{ steps.tag.outputs.name }}.zip . -x *.git* /*node_modules/* .editorconfig /*dist/*
-      - name: Upload artifacts
-        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          path: source-${{ steps.tag.outputs.name }}.zip
-          name: source.zip
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
-          files: |
-            source-${{ steps.tag.outputs.name }}.zip
+      #- name: Pack artifacts
+      #  id: pack_artifacts
+      #  if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
+      #  run: |
+      #    zip -r source-${{ steps.tag.outputs.name }}.zip . -x *.git* /*node_modules/* .editorconfig /*dist/*
+      #- name: Upload artifacts
+      #  if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    path: source-${{ steps.tag.outputs.name }}.zip
+      #    name: source.zip
       #- name: Archive production artifacts
       #  uses: actions/upload-artifact@v4
       #  with:
@@ -93,6 +85,14 @@ jobs:
         with:
           path: webapp-${{ steps.tag.outputs.name }}.zip
           name: webapp.zip
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Web App"
+          files: |
+            webapp-${{ steps.tag.outputs.name }}.zip
       #- name: Zip Dist
       #  uses: thedoctor0/zip-release@0.7.5
       #  with:
