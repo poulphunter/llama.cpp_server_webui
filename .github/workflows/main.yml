@@ -78,7 +78,7 @@ jobs:
         if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
         run: |
           cd dist
-          zip -r webapp-${{ steps.tag.outputs.name }}.zip . -x *.git* *.idea* /*node_modules/* .editorconfig
+          zip -r ../webapp-${{ steps.tag.outputs.name }}.zip . -x *.git* *.idea* /*node_modules/* .editorconfig
       - name: Upload artifacts2
         if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
         uses: actions/upload-artifact@v4
