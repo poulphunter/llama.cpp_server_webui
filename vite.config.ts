@@ -1,12 +1,15 @@
-import { defineConfig, PluginOption } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteSingleFile } from 'vite-plugin-singlefile';
+/*
+import { PluginOption } from 'vite';
 import path from 'node:path';
 import fs from 'node:fs';
 import zlib from 'node:zlib';
+*/
 
 /* eslint-disable */
-
+/*
 const MAX_BUNDLE_SIZE = 1.5 * 1024 * 1024; // only increase when absolutely necessary
 
 const GUIDE_FOR_FRONTEND = `
@@ -17,13 +20,13 @@ const GUIDE_FOR_FRONTEND = `
   To make changes, refer to the "Web UI" section in the README.
 -->
 `.trim();
-
+*/
 const FRONTEND_PLUGINS = [react()];
 
 const BUILD_PLUGINS = [
   ...FRONTEND_PLUGINS,
   viteSingleFile(),
-  (function llamaCppPlugin() {
+ /* (function llamaCppPlugin() {
     let config: any;
     return {
       name: 'llamacpp:build',
@@ -62,7 +65,7 @@ const BUILD_PLUGINS = [
         fs.writeFileSync(targetOutputFile, compressed);
       },
     } satisfies PluginOption;
-  })(),
+  })(),*/
 ];
 
 export default defineConfig({
