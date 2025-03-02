@@ -4,6 +4,8 @@ on:
   push:
     branches: [ main ]
 
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -22,29 +24,18 @@ jobs:
         with:
           submodules: true
           fetch-depth: '0'
-      - name: Generate Git Tag
-        id: generate_tag
-        shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+      - name: Determine tag name
+        id: tag
+        shell: bash
         run: |
-          VERSION_PREFIX="v"
-          VERSION_MAJOR_MINOR="0.1"
-          VERSION_PATCH=$(git tag --list "${VERSION_PREFIX}.*" --sort=-version:refname | head -n 1 | grep -oE '[0-9]+$')
-          if [ -z "$VERSION_PATCH" ]; then
-            VERSION_PATCH=0
+          BUILD_NUMBER="$(git rev-list --count HEAD)"
+          SHORT_HASH="$(git rev-parse --short=7 HEAD)"
+          if [[ "${{ env.BRANCH_NAME }}" == "master" ]]; then
+            echo "name=b${BUILD_NUMBER}" >> $GITHUB_OUTPUT
           else
-            VERSION_PATCH=$((VERSION_PATCH + 1))
+            SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
+            echo "name=${SAFE_NAME}-b${BUILD_NUMBER}-${SHORT_HASH}" >> $GITHUB_OUTPUT
           fi
-          NEW_TAG="${VERSION_PREFIX}${VERSION_MAJOR_MINOR}.${VERSION_PATCH}"
-          echo "Generated new tag: $NEW_TAG"
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-
-      - name: Push Git Tag
-        shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "github-actions@users.noreply.github.com"
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
       #- name: Archive production artifacts
       #  uses: actions/upload-artifact@v4
       #  with:
