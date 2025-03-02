@@ -47,10 +47,14 @@ jobs:
         with:
           path: source-${{ steps.tag.outputs.name }}.zip
           name: source.zip
-      - name: 'Create Release'
-        run: hub release create release_name -m ${{ steps.tag.outputs.name }} -a source-${{ steps.tag.outputs.name }}.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            source-${{ steps.tag.outputs.name }}.zip
       #- name: Archive production artifacts
       #  uses: actions/upload-artifact@v4
       #  with:
