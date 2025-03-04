@@ -46,7 +46,8 @@ export const useVSCodeContext = (
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        window.parent.postMessage({ command: 'escapePressed' }, '*');
+        // no sonar as it's escape key only
+        window.parent.postMessage({ command: 'escapePressed' }, '*'); //NOSONAR
       }
     };
 

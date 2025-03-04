@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../utils/app.context';
-import { CONFIG_DEFAULT } from '../Config';
-import { isDev } from '../Config';
+import { CONFIG_DEFAULT, isDev } from '../Config';
 import StorageUtils from '../utils/storage';
 import { isBoolean, isNumeric, isString } from '../utils/misc';
 import {
@@ -231,21 +230,19 @@ export default function SettingDialog() {
           type: SettingInputType.CUSTOM,
           key: 'custom', // dummy key, won't be used
           component: () => (
-            <>
-              <p className="mb-8">
-                {t('Settings.labels.Experimental1')}
-                <br />
-                <br />
-                {t('Settings.labels.Experimental2')}{' '}
-                <OpenInNewTab href="https://github.com/ggerganov/llama.cpp/issues/new?template=019-bug-misc.yml">
-                  Bug (misc.)
-                </OpenInNewTab>{' '}
-                {t('Settings.labels.Experimental3')}
-                <br />
-                <br />
-                {t('Settings.labels.Experimental4')}
-              </p>
-            </>
+            <p className="mb-8">
+              {t('Settings.labels.Experimental1')}
+              <br />
+              <br />
+              {t('Settings.labels.Experimental2')}{' '}
+              <OpenInNewTab href="https://github.com/ggerganov/llama.cpp/issues/new?template=019-bug-misc.yml">
+                Bug (misc.)
+              </OpenInNewTab>{' '}
+              {t('Settings.labels.Experimental3')}
+              <br />
+              <br />
+              {t('Settings.labels.Experimental4')}
+            </p>
           ),
         },
         {
@@ -393,7 +390,7 @@ export default function SettingDialog() {
       className="h-screen overflow-y-auto overflow-x-clip flex flex-col bg-base-200 py-4 px-4"
     >
       <div className="flex flex-row items-center justify-between mt-4 absolute top-0 right-0 z-50">
-        <div
+        <button
           className="tooltip tooltip-bottom z-100"
           data-tip={t('Settings.CloseBtn')}
           onClick={() => {
@@ -404,11 +401,19 @@ export default function SettingDialog() {
               elem2.style.display = 'block';
             }
           }}
+          onKeyDown={() => {
+            const elem = document.getElementById('settingBlock');
+            const elem2 = document.getElementById('mainBlock');
+            if (elem && elem2) {
+              elem.style.display = 'none';
+              elem2.style.display = 'block';
+            }
+          }}
         >
-          <button className="btn">
+          <div className="btn">
             <BiXCircle className="w-6 h-6" />
-          </button>
-        </div>
+          </div>
+        </button>
       </div>
       <div className="flex flex-row items-center justify-between mt-4 z-10">
         <h2 className="font-bold ml-4">{t('Settings.Settings')}</h2>
@@ -425,10 +430,13 @@ export default function SettingDialog() {
           <div>{t('Settings.presetLabel')}</div>
         </div>
         <div className="block sm:flex justify-end">
-          <div
+          <button
             className="tooltip tooltip-bottom z-100"
             data-tip={t('Settings.loadPresetBtn')}
             onClick={() => {
+              document?.getElementById('configJsonInput')?.click();
+            }}
+            onKeyDown={() => {
               document?.getElementById('configJsonInput')?.click();
             }}
           >
@@ -442,22 +450,23 @@ export default function SettingDialog() {
               accept=".json"
             />
             <div className="dropdown dropdown-end dropdown-bottom">
-              <div tabIndex={0} role="button" className="btn m-1">
+              <div className="btn m-1">
                 <BiDownload className="h-6 w-6" />
               </div>
             </div>
-          </div>
-          <div
+          </button>
+          <button
             className="tooltip tooltip-bottom z-100"
             data-tip={t('Settings.savePresetBtn')}
             onClick={downloadConfigs}
+            onKeyDown={downloadConfigs}
           >
             <div className="dropdown dropdown-end dropdown-bottom">
-              <div tabIndex={0} role="button" className="btn m-1">
+              <div className="btn m-1">
                 <BiSave className="h-6 w-6" />
               </div>
             </div>
-          </div>
+          </button>
           {promptSelectOptions.length > 0 ? (
             <div className="">
               <PresetsAutocomplete />
@@ -524,28 +533,34 @@ export default function SettingDialog() {
         </div>
       </div>
       <div className="flex flex-row items-center justify-between mt-4 sticky bottom-0 z-10">
-        <div
+        <button
           className="tooltip tooltip-top z-100"
           data-tip={t('Settings.resetBtn')}
           onClick={() => {
             resetConfig();
           }}
+          onKeyDown={() => {
+            resetConfig();
+          }}
         >
-          <button className="btn">
+          <div className="btn">
             <BiReset className="w-6 h-6" />
-          </button>
-        </div>
-        <div
+          </div>
+        </button>
+        <button
           className="tooltip tooltip-top z-100"
           data-tip={t('Settings.saveBtn')}
           onClick={() => {
             handleSave();
           }}
+          onKeyDown={() => {
+            handleSave();
+          }}
         >
-          <button className="btn btn-primary">
+          <div className="btn btn-primary">
             <BiSave className="h-6 w-6" />
-          </button>
-        </div>
+          </div>
+        </button>
       </div>
     </div>
   );
@@ -556,15 +571,15 @@ function SettingsModalLongInput({
   value,
   onChange,
   label,
-}: {
+}: Readonly<{
   configKey: SettKey;
   value: string;
   onChange: (value: string) => void;
   label?: string;
-}) {
+}>) {
   return (
     <label className="form-control mb-2">
-      <div className="label inline">{label || configKey}</div>
+      <div className="label inline">{label ?? configKey}</div>
       <textarea
         className="textarea textarea-bordered h-24"
         placeholder={`Default: ${CONFIG_DEFAULT[configKey] || 'none'}`}
@@ -580,13 +595,13 @@ function SettingsModalShortInput({
   value,
   onChange,
   label,
-}: {
+}: Readonly<{
   configKey: SettKey;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
   onChange: (value: string) => void;
   label?: string;
-}) {
+}>) {
   const { t } = useTranslation();
   const transHelpMsg = t('Settings.meaning.' + configKey);
   return (
@@ -594,16 +609,16 @@ function SettingsModalShortInput({
       {/* on mobile, we simply show the help message here */}
       {transHelpMsg && (
         <div className="block md:hidden mb-1">
-          <b>{label || configKey}</b>
+          <b>{label ?? configKey}</b>
           <br />
           <p className="text-xs">{transHelpMsg}</p>
         </div>
       )}
       <label className="input input-bordered join-item grow flex items-center gap-2 mb-2">
         <div className="dropdown dropdown-hover">
-          <div tabIndex={0} role="button" className="font-bold hidden md:block">
-            {label || configKey}
-          </div>
+          <button className="font-bold hidden md:block">
+            {label ?? configKey}
+          </button>
           {transHelpMsg && (
             <div className="dropdown-content menu bg-base-100 rounded-box z-10 w-64 p-2 shadow mt-4">
               {transHelpMsg}
@@ -627,12 +642,12 @@ function SettingsModalCheckbox({
   value,
   onChange,
   label,
-}: {
+}: Readonly<{
   configKey: SettKey;
   value: boolean;
   onChange: (value: boolean) => void;
   label: string;
-}) {
+}>) {
   return (
     <div className="flex flex-row items-center mb-2">
       <input

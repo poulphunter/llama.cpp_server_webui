@@ -335,7 +335,7 @@ export default function ChatScreen() {
               }}
               onKeyDown={(e) => {
                 // noinspection JSDeprecatedSymbols
-                if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+                if (e.nativeEvent.isComposing || e.keyCode === 229) return; //NOSONAR
                 if (e.key === 'Enter' && e.shiftKey) return;
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();

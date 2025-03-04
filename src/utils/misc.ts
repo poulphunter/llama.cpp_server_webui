@@ -45,7 +45,7 @@ export const copyStr = (textToCopy: string) => {
     document.body.prepend(textArea);
     textArea.select();
     // noinspection JSDeprecatedSymbols
-    document.execCommand('copy');
+    document.execCommand('copy'); //NOSONAR
   }
 };
 

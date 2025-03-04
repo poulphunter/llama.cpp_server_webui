@@ -84,8 +84,12 @@ const StorageUtils = {
     // startNode can never be undefined here
     let currNode: Message | undefined = startNode;
     while (currNode) {
-      if (currNode.type !== 'root' || (currNode.type === 'root' && includeRoot))
+      if (
+        currNode.type !== 'root' ||
+        (currNode.type === 'root' && includeRoot)
+      ) {
         res.push(currNode);
+      }
       currNode = nodeMap.get(currNode.parent ?? -1);
     }
     res.sort((a, b) => a.timestamp - b.timestamp);
@@ -251,7 +255,9 @@ async function migrationLStoIDB() {
       res.push(JSON.parse(localStorage.getItem(key) ?? '{}'));
     }
   }
-  if (res.length === 0) return;
+  if (res.length === 0) {
+    return;
+  }
   await db.transaction('rw', db.conversations, db.messages, async () => {
     let migratedCount = 0;
     for (const conv of res) {

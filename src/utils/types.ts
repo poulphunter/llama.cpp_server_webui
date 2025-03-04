@@ -6,10 +6,13 @@ export interface TimingReport {
 }
 
 /**
- * What is conversation "branching"? It is a feature that allows the user to edit an old message in the history, while still keeping the conversation flow.
- * Inspired by ChatGPT / Claude / Hugging Chat where you edit a message, a new branch of the conversation is created, and the old message is still visible.
+ * What is conversation "branching"? It is a feature that allows the user to edit an old message in the history,
+ * while still keeping the conversation flow.
+ * Inspired by ChatGPT / Claude / Hugging Chat where you edit a message, a new branch of the conversation is created,
+ * and the old message is still visible.
  *
- * We use the same node-based structure like other chat UIs, where each message has a parent and children. A "root" message is the first message in a conversation, which will not be displayed in the UI.
+ * We use the same node-based structure like other chat UIs, where each message has a parent and children.
+ * A "root" message is the first message in a conversation, which will not be displayed in the UI.
  *
  * root
  *  ├── message 1
@@ -38,7 +41,8 @@ export interface Message {
   id: number;
   convId: string;
   type: 'text' | 'root';
-  timestamp: number; // timestamp from Date.now()
+  // timestamp from Date.now()
+  timestamp: number;
   role: 'user' | 'assistant' | 'system';
   content: string;
   timings?: TimingReport;
@@ -67,9 +71,12 @@ export interface MessageExtraContext {
 export type APIMessage = Pick<Message, 'role' | 'content'>;
 
 export interface Conversation {
-  id: string; // format: `conv-{timestamp}`
-  lastModified: number; // timestamp from Date.now()
-  currNode: Message['id']; // the current message node being viewed
+  // format: `conv-{timestamp}`
+  id: string;
+  // timestamp from Date.now()
+  lastModified: number;
+  // the current message node being viewed
+  currNode: Message['id'];
   name: string;
 }
 
