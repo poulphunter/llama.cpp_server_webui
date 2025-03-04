@@ -5,6 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import sonarjs from 'eslint-plugin-sonarjs';
 
+// noinspection JSCheckFunctionSignatures
 export default tseslint.config(
   //eslint.configs.recommended,
   tseslint.configs.recommended,
