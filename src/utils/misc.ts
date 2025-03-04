@@ -20,7 +20,6 @@ export async function* getSSEStreamAsync(fetchResponse: Response) {
     .pipeThrough(new TextLineStream());
   // @ts-expect-error asyncIterator complains about type, but it should work
   for await (const line of asyncIterator(lines)) {
-    //if (isDev) console.log({ line });
     if (line.startsWith('data:') && !line.endsWith('[DONE]')) {
       const data = JSON.parse(line.slice(5));
       yield data;
@@ -35,7 +34,7 @@ export async function* getSSEStreamAsync(fetchResponse: Response) {
 export const copyStr = (textToCopy: string) => {
   // Navigator clipboard api needs a secure context (https)
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(textToCopy);
+    navigator.clipboard.writeText(textToCopy).then(() => {});
   } else {
     // Use the 'out of viewport hidden text area' trick
     const textArea = document.createElement('textarea');
@@ -90,8 +89,8 @@ export function filterThoughtFromMsgs(messages: APIMessage[]) {
 
 export function classNames(classes: Record<string, boolean>): string {
   return Object.entries(classes)
-    .filter(([_, value]) => value)
-    .map(([key, _]) => key)
+    .filter(([, value]) => value)
+    .map(([key]) => key)
     .join(' ');
 }
 export const throttle = <T extends unknown[]>(

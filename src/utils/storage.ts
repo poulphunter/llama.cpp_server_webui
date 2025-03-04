@@ -175,7 +175,7 @@ const StorageUtils = {
     event.addEventListener('conversationChange', fn);
   },
   offConversationChanged(callback: CallbackConversationChanged) {
-    const fn = onConversationChangedHandlers.find(([cb, _]) => cb === callback);
+    const fn = onConversationChangedHandlers.find(([cb]) => cb === callback);
     if (fn) {
       event.removeEventListener('conversationChange', fn[1]);
     }
@@ -195,7 +195,6 @@ const StorageUtils = {
     const conv = db.conversations.toArray();
     conv.then((convList) => {
       for (let i = 0; i < convList.length; i++) {
-        //db.conversations.delete(convList[i].id);
         const convID = convList[i].id;
         this.remove(convID);
       }

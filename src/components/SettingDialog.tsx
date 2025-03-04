@@ -378,7 +378,6 @@ export default function SettingDialog() {
           resetSettings();
         });
       }
-      // const formatted = JSON.stringify(result, null, 2);
       console.log('JSON loaded !');
       resetSettings();
     };
@@ -386,7 +385,6 @@ export default function SettingDialog() {
     if (fItem) {
       fr.readAsText(fItem);
     }
-    return;
   };
 
   return (

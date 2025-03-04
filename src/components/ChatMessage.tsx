@@ -51,6 +51,8 @@ export default function ChatMessage({
   const prevSibling = siblingLeafNodeIds[siblingCurrIdx - 1];
 
   // for reasoning model, we split the message into content and thought
+  // eslint-disable-next-line
+  // eslint-disable-next-line sonarjs/todo-tag
   // TODO: implement this as remark/rehype plugin in the future
   const { content, thought, isThinking }: SplitMessage = useMemo(() => {
     if (msg.content === null || msg.role !== 'assistant') {
@@ -180,11 +182,15 @@ export default function ChatMessage({
                                   <b>{extra.name}</b>
                                   <pre>{extra.content}</pre>
                                 </div>
-                              ) : extra.type === 'context' ? (
-                                <div key={i}>
+                              ) : // eslint-disable-next-line sonarjs/no-nested-conditional
+                              extra.type === 'context' ? (
+                                <div key={extra + i.toString()}>
                                   <pre>{extra.content}</pre>
                                 </div>
-                              ) : null // TODO: support other extra types
+                              ) : null
+                            // eslint-disable-next-line
+                            // eslint-disable-next-line sonarjs/todo-tag
+                            // TODO: support other extra types
                           )}
                         </div>
                       </details>

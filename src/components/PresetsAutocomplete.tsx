@@ -6,13 +6,7 @@ import { useAppContext } from '../utils/app.context.tsx';
 import { CONFIG_DEFAULT, isDev } from '../Config.ts';
 import { isBoolean, isNumeric, isString } from '../utils/misc.ts';
 import { useTranslation } from 'react-i18next';
-/*
-type Country = {
-  name: {
-    common: string;
-  };
-};
-*/
+
 const PresetsAutocomplete = () => {
   const { t } = useTranslation();
   const { promptSelectOptions, saveConfig, resetSettings, promptSelectConfig } =
@@ -30,15 +24,12 @@ const PresetsAutocomplete = () => {
   //query rest presets api and set the presets list
   useEffect(() => {
     async function fetchData() {
-      // const url = "https://restpresets.com/v3.1/all?fields=name";
-      // const response = await fetch(url);
-      // const presets = (await response.json()) as Country[];
-      // const newItems = presets.map((p) => p.name.common).sort();
-      // setPresets(newItems);
-      const itms = promptSelectOptions.map((p) => p.value).sort();
+      const itms = promptSelectOptions
+        .map((p) => p.value)
+        .sort((a, b) => a.localeCompare(b));
       setPresets(itms);
     }
-    fetchData();
+    fetchData().then(() => {});
   }, [promptSelectOptions]);
 
   useEffect(() => {
@@ -50,21 +41,16 @@ const PresetsAutocomplete = () => {
     //if the val changes, we filter items so that it can be filtered. and set it as new state
     const newItems = presets
       .filter((p) => p.toLowerCase().includes(val.toLowerCase()))
-      .sort();
+      .sort((a, b) => a.localeCompare(b));
     setItems(newItems);
   }, [presets, val]);
 
-  const selectPrompt = (value: number) => {
-    // setSelectedConfig(value);
+  const selectPrompt = (value: number): void => {
     if (value === -1) {
       resetSettings();
       return;
     }
-    if (
-      promptSelectConfig &&
-      promptSelectConfig[value] &&
-      promptSelectConfig[value].config
-    ) {
+    if (promptSelectConfig?.[value]?.config) {
       const newConfig: typeof CONFIG_DEFAULT = JSON.parse(
         JSON.stringify(CONFIG_DEFAULT)
       );

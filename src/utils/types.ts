@@ -48,7 +48,10 @@ export interface Message {
   children: Message['id'][];
 }
 
-type MessageExtra = MessageExtraTextFile | MessageExtraContext; // TODO: will add more in the future
+type MessageExtra = MessageExtraTextFile | MessageExtraContext;
+// eslint-disable-next-line
+// eslint-disable-next-line sonarjs/todo-tag
+// TODO: will add more in the future
 
 export interface MessageExtraTextFile {
   type: 'textFile';

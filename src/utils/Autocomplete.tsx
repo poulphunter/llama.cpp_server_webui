@@ -41,7 +41,7 @@ const Autocomplete = (props: Props) => {
           {items.map((item, index) => {
             return (
               <li
-                key={item}
+                key={item + index.toString()}
                 tabIndex={index + 1}
                 className="border-b border-b-base-content/10 w-full"
               >

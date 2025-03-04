@@ -29,7 +29,7 @@ export function ConversationListDownloadDeleteButtonHeader({
     if (isCurrConvGenerating || !viewingChat) return;
     const convId = viewingChat?.conv.id;
     if (window.confirm(t('ConversationList.deleteConfirm'))) {
-      StorageUtils.remove(convId);
+      StorageUtils.remove(convId).then(() => {});
       navigate('/');
     }
   };
@@ -122,7 +122,7 @@ export default function ConversationList() {
       setConversations(await StorageUtils.getAllConversations());
     };
     StorageUtils.onConversationChanged(handleConversationChange);
-    handleConversationChange();
+    handleConversationChange().then(() => {});
     return () => {
       StorageUtils.offConversationChanged(handleConversationChange);
     };
@@ -171,10 +171,11 @@ export default function ConversationList() {
         type: 'text/json',
       });
       StorageUtils.clearConversations().then(() => {
+        // eslint-disable-next-line sonarjs/no-nested-functions
         StorageUtils.setConversations(blob, () => {
           console.log('Database loaded !');
           navigate('/');
-          handleConversationChange();
+          handleConversationChange().then(() => {});
         });
       });
     };
@@ -182,7 +183,6 @@ export default function ConversationList() {
     if (fItem) {
       fr.readAsArrayBuffer(fItem);
     }
-    return;
   };
 
   return (

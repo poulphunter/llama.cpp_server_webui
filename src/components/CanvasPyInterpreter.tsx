@@ -76,6 +76,7 @@ const runCodeInWorker = (
   interrupt: () => void;
 } => {
   startWorker();
+  // eslint-disable-next-line sonarjs/pseudo-random
   const id = Math.random() * 1e8;
   const context = {};
   if (interruptBuffer) {
@@ -88,7 +89,6 @@ const runCodeInWorker = (
       if (id !== event.data.id) return;
       if (running) {
         callbackRunning();
-        return;
       } else if (error) {
         resolve(error.toString());
       } else {
@@ -137,8 +137,7 @@ export default function CanvasPyInterpreter() {
   // run code on mount
   useEffect(() => {
     setCode(canvasData?.content ?? '');
-    runCode(canvasData?.content ?? '');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    runCode(canvasData?.content ?? '').then(() => {});
   }, [canvasData?.content]);
 
   if (canvasData?.type !== CanvasType.PY_INTERPRETER) {

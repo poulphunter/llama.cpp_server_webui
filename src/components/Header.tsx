@@ -100,7 +100,7 @@ export function HeaderLanguageBlock({ id }: { id: string }) {
                 value={language}
                 onChange={() => {
                   setLanguage(code);
-                  i18next.changeLanguage(code);
+                  i18next.changeLanguage(code).then(() => {});
                 }}
                 onClick={() => {
                   closeDropDownMenu(id);

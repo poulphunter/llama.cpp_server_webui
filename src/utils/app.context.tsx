@@ -4,7 +4,6 @@ import React, {
   useEffect,
   useState,
   useCallback,
-  useMemo,
 } from 'react';
 import {
   APIMessage,
@@ -24,6 +23,7 @@ import { BASE_URL, CONFIG_DEFAULT, isDev } from '../Config';
 import { matchPath, useLocation, useNavigate } from 'react-router';
 import i18next from 'i18next';
 import useStateCallback from './UseStateCallback.tsx';
+
 type languageOption = { language: string; code: string };
 
 const PROMPT_JSON = [
@@ -122,9 +122,11 @@ export const AppContextProvider = ({
   const [settingsSeed, setSettingsSeed] = useState(1);
   const [promptSeed, setPromptSeed] = useState(42);
   const resetSettings = useCallback(() => {
+    // eslint-disable-next-line sonarjs/pseudo-random
     setSettingsSeed(Math.random());
   }, []);
   const resetPromptSeed = () => {
+    // eslint-disable-next-line sonarjs/pseudo-random
     setPromptSeed(Math.random());
   };
 
@@ -354,7 +356,9 @@ export const AppContextProvider = ({
     try {
       await generateMessage(convId, currMsgId, onChunk);
       return true;
+      // eslint-disable-next-line sonarjs/no-ignored-exceptions,@typescript-eslint/no-unused-vars
     } catch (_) {
+      // eslint-disable-next-line
       // TODO: rollback
     }
     return false;
@@ -519,36 +523,38 @@ export const AppContextProvider = ({
     promptSelectFirstConfig,
   ]);
 
-  const obj = useMemo(
-    () => ({
-      canvasData,
-      closeDropDownMenu,
-      config,
-      isGenerating,
-      language,
-      languageOptions,
-      pendingMessages,
-      promptSeed,
-      promptSelectConfig,
-      promptSelectFirstConfig,
-      promptSelectOptions,
-      replaceMessageAndGenerate,
-      resetPromptSeed,
-      resetSettings,
-      saveConfig,
-      sendMessage,
-      setCanvasData,
-      setLanguage,
-      setPromptSelectConfig,
-      setPromptSelectFirstConfig,
-      setPromptSelectOptions,
-      settingsSeed,
-      stopGenerating,
-      viewingChat,
-    }),
-    []
+  return (
+    <AppContext.Provider
+      value={{
+        canvasData,
+        closeDropDownMenu,
+        config,
+        isGenerating,
+        language,
+        languageOptions,
+        pendingMessages,
+        promptSeed,
+        promptSelectConfig,
+        promptSelectFirstConfig,
+        promptSelectOptions,
+        replaceMessageAndGenerate,
+        resetPromptSeed,
+        resetSettings,
+        saveConfig,
+        sendMessage,
+        setCanvasData,
+        setLanguage,
+        setPromptSelectConfig,
+        setPromptSelectFirstConfig,
+        setPromptSelectOptions,
+        settingsSeed,
+        stopGenerating,
+        viewingChat,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
   );
-  return <AppContext.Provider value={obj}>{children}</AppContext.Provider>;
 };
 
 export const useAppContext = () => useContext(AppContext);
