@@ -1,8 +1,10 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import tseslint from 'typescript-eslint';
+import sonarjs from 'eslint-plugin-sonarjs';
+
 
 export default tseslint.config(
   { ignores: ['dist'] },
@@ -14,6 +16,7 @@ export default tseslint.config(
       globals: globals.browser,
     },
     plugins: {
+      sonarjs,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
     },
@@ -21,6 +24,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+      'sonarjs/no-implicit-dependencies': 'error',
     },
   },
-)
+);
