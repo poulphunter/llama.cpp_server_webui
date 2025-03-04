@@ -26,7 +26,7 @@ const FRONTEND_PLUGINS = [react()];
 const BUILD_PLUGINS = [
   ...FRONTEND_PLUGINS,
   viteSingleFile(),
- /* (function llamaCppPlugin() {
+  /* (function llamaCppPlugin() {
     let config: any;
     return {
       name: 'llamacpp:build',
