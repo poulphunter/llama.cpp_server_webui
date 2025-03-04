@@ -247,7 +247,7 @@ export const AppContextProvider = ({
         dry_allowed_length: config.dry_allowed_length,
         dry_penalty_last_n: config.dry_penalty_last_n,
         max_tokens: config.max_tokens,
-        timings_per_token: !!config.showTokensPerSecond,
+        timings_per_token: config.showTokensPerSecond,
         ...(config.custom.length ? JSON.parse(config.custom) : {}),
       };
 
