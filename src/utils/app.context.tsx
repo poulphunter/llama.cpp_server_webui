@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 import {
   APIMessage,
@@ -269,12 +270,11 @@ export const AppContextProvider = ({
       }
       const chunks = getSSEStreamAsync(fetchResponse);
       for await (const chunk of chunks) {
-        // const stop = chunk.stop;
         if (chunk.error) {
           throw new Error(chunk.error?.message || 'Unknown error');
         }
         const addedContent = chunk.choices[0].delta.content;
-        const lastContent = pendingMsg.content || '';
+        const lastContent = pendingMsg.content ?? '';
         if (addedContent) {
           pendingMsg = {
             ...pendingMsg,
@@ -335,7 +335,7 @@ export const AppContextProvider = ({
 
     const now = Date.now();
     const currMsgId = now;
-    StorageUtils.appendMsg(
+    await StorageUtils.appendMsg(
       {
         id: currMsgId,
         timestamp: now,
@@ -378,7 +378,7 @@ export const AppContextProvider = ({
     if (content !== null) {
       const now = Date.now();
       const currMsgId = now;
-      StorageUtils.appendMsg(
+      await StorageUtils.appendMsg(
         {
           id: currMsgId,
           timestamp: now,
@@ -428,7 +428,6 @@ export const AppContextProvider = ({
     { language: 'Spanish', code: 'es' },
   ];
   const [language, setLanguage] = useStateCallback(i18next.language);
-  // const [language, setLanguage] = useState(i18next.language);
   const [promptSelectOptions, setPromptSelectOptions] = useState<
     { key: number; value: string }[]
   >([]);
@@ -446,7 +445,7 @@ export const AppContextProvider = ({
           else return response.json();
         })
         .then((data) => {
-          if (data && data.presets) {
+          if (data?.presets) {
             setPromptSelectConfig(data.presets);
           }
         })
@@ -503,7 +502,6 @@ export const AppContextProvider = ({
       promptSelectFirstConfig != -1
     ) {
       setSelectedConfig(0);
-      //selectPrompt(0);
       if (isDev)
         console.log(
           'Saving config',
@@ -521,38 +519,36 @@ export const AppContextProvider = ({
     promptSelectFirstConfig,
   ]);
 
-  return (
-    <AppContext.Provider
-      value={{
-        isGenerating,
-        viewingChat,
-        pendingMessages,
-        sendMessage,
-        stopGenerating,
-        replaceMessageAndGenerate,
-        canvasData,
-        setCanvasData,
-        config,
-        saveConfig,
-        settingsSeed,
-        resetSettings,
-        closeDropDownMenu,
-        languageOptions,
-        language,
-        setLanguage,
-        promptSeed,
-        resetPromptSeed,
-        promptSelectOptions,
-        setPromptSelectOptions,
-        promptSelectConfig,
-        setPromptSelectConfig,
-        promptSelectFirstConfig,
-        setPromptSelectFirstConfig,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
+  const obj = useMemo(
+    () => ({
+      canvasData,
+      closeDropDownMenu,
+      config,
+      isGenerating,
+      language,
+      languageOptions,
+      pendingMessages,
+      promptSeed,
+      promptSelectConfig,
+      promptSelectFirstConfig,
+      promptSelectOptions,
+      replaceMessageAndGenerate,
+      resetPromptSeed,
+      resetSettings,
+      saveConfig,
+      sendMessage,
+      setCanvasData,
+      setLanguage,
+      setPromptSelectConfig,
+      setPromptSelectFirstConfig,
+      setPromptSelectOptions,
+      settingsSeed,
+      stopGenerating,
+      viewingChat,
+    }),
+    []
   );
+  return <AppContext.Provider value={obj}>{children}</AppContext.Provider>;
 };
 
 export const useAppContext = () => useContext(AppContext);
