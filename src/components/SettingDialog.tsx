@@ -15,6 +15,13 @@ import {
 import { OpenInNewTab } from '../utils/common';
 import { useTranslation } from 'react-i18next';
 import { HeaderLanguageBlock, HeaderThemeBlock } from './Header.tsx';
+import {
+  BiDownload,
+  BiReset,
+  BiSave,
+  BiSliderAlt,
+  BiXCircle,
+} from 'react-icons/bi';
 
 type SettKey = keyof typeof CONFIG_DEFAULT;
 
@@ -77,7 +84,7 @@ export default function SettingDialog() {
     fields: (SettingFieldInput | SettingFieldCustom)[];
   }
 
-  const ICON_CLASSNAME = 'w-4 h-4 mr-1 inline';
+  const ICON_CLASSNAME = 'w-6 h-6 mr-1 inline';
 
   const SETTING_SECTIONS: SettingSection[] = [
     {
@@ -487,20 +494,7 @@ export default function SettingDialog() {
           }}
         >
           <button className="btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-              />
-            </svg>
+            <BiXCircle className="w-6 h-6" />
           </button>
         </div>
       </div>
@@ -515,17 +509,10 @@ export default function SettingDialog() {
       </div>
       <div className="inline">
         <div className="px-4 mt-4 flex">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="size-5"
-          >
-            <path d="M10 3.75a2 2 0 1 0-4 0 2 2 0 0 0 4 0ZM17.25 4.5a.75.75 0 0 0 0-1.5h-5.5a.75.75 0 0 0 0 1.5h5.5ZM5 3.75a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 .75.75ZM4.25 17a.75.75 0 0 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5h1.5ZM17.25 17a.75.75 0 0 0 0-1.5h-5.5a.75.75 0 0 0 0 1.5h5.5ZM9 10a.75.75 0 0 1-.75.75h-5.5a.75.75 0 0 1 0-1.5h5.5A.75.75 0 0 1 9 10ZM17.25 10.75a.75.75 0 0 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5h1.5ZM14 10a2 2 0 1 0-4 0 2 2 0 0 0 4 0ZM10 16.25a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z" />
-          </svg>
+          <BiSliderAlt className="h-6 w-6" />
           <div>{t('Settings.presetLabel')}</div>
         </div>
-        <div className="flex justify-end">
+        <div className="block sm:flex justify-end">
           <div
             className="tooltip tooltip-bottom z-100"
             data-tip={t('Settings.loadPresetBtn')}
@@ -544,20 +531,7 @@ export default function SettingDialog() {
             />
             <div className="dropdown dropdown-end dropdown-bottom">
               <div tabIndex={0} role="button" className="btn m-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"
-                  />
-                </svg>
+                <BiDownload className="h-6 w-6" />
               </div>
             </div>
           </div>
@@ -568,17 +542,7 @@ export default function SettingDialog() {
           >
             <div className="dropdown dropdown-end dropdown-bottom">
               <div tabIndex={0} role="button" className="btn m-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={24}
-                  height={24}
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M20 7.423v10.962q0 .69-.462 1.153T18.384 20H5.616q-.691 0-1.153-.462T4 18.384V5.616q0-.691.463-1.153T5.616 4h10.961zm-1 .427L16.15 5H5.616q-.27 0-.443.173T5 5.616v12.769q0 .269.173.442t.443.173h12.769q.269 0 .442-.173t.173-.443zm-7 8.688q.827 0 1.414-.586T14 14.538t-.587-1.413T12 12.539t-1.413.586T10 14.538t.587 1.414t1.413.586M6.77 9.77h7.422v-3H6.77zM5 7.85V19V5z"
-                  ></path>
-                </svg>
+                <BiSave className="h-6 w-6" />
               </div>
             </div>
           </div>
@@ -699,20 +663,7 @@ export default function SettingDialog() {
           }}
         >
           <button className="btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3"
-              />
-            </svg>
+            <BiReset className="w-6 h-6" />
           </button>
         </div>
         <div
@@ -723,17 +674,7 @@ export default function SettingDialog() {
           }}
         >
           <button className="btn btn-primary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width={24}
-              height={24}
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M20 7.423v10.962q0 .69-.462 1.153T18.384 20H5.616q-.691 0-1.153-.462T4 18.384V5.616q0-.691.463-1.153T5.616 4h10.961zm-1 .427L16.15 5H5.616q-.27 0-.443.173T5 5.616v12.769q0 .269.173.442t.443.173h12.769q.269 0 .442-.173t.173-.443zm-7 8.688q.827 0 1.414-.586T14 14.538t-.587-1.413T12 12.539t-1.413.586T10 14.538t.587 1.414t1.413.586M6.77 9.77h7.422v-3H6.77zM5 7.85V19V5z"
-              ></path>
-            </svg>
+            <BiSave className="h-6 w-6" />
           </button>
         </div>
       </div>
