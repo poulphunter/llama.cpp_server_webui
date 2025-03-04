@@ -41,15 +41,22 @@ const Autocomplete = (props: Props) => {
           {items.map((item, index) => {
             return (
               <li
-                key={index}
+                key={item}
                 tabIndex={index + 1}
-                onClick={() => {
-                  onChange(item);
-                  setOpen(false);
-                }}
                 className="border-b border-b-base-content/10 w-full"
               >
-                <button>{item}</button>
+                <button
+                  onClick={() => {
+                    onChange(item);
+                    setOpen(false);
+                  }}
+                  onKeyDown={() => {
+                    onChange(item);
+                    setOpen(false);
+                  }}
+                >
+                  {item}
+                </button>
               </li>
             );
           })}
