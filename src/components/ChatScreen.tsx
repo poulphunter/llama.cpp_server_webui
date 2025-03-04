@@ -257,12 +257,16 @@ export default function ChatScreen() {
                     {t('ChatScreen.suggestions')}
                   </div>
                   <div className="text-center grid grid-col-1 items-center">
-                    {[...config.questionIdeas].map((idea: string, index) => (
-                      <div
+                    {[...config.questionIdeas].map((idea: string) => (
+                      <button
                         className="card border-1 border-dotted bg-base-200 shadow-xl m-4 hover:bg-base-100 hover:border-base-200 hover:outline-offset-2 hover:outline-2"
-                        key={index}
+                        key={idea}
                         style={{ whiteSpace: 'pre-wrap' }}
                         onClick={() => {
+                          setInputMsg(idea);
+                          setAutomaticSend(true);
+                        }}
+                        onKeyDown={() => {
                           setInputMsg(idea);
                           setAutomaticSend(true);
                         }}
@@ -270,7 +274,7 @@ export default function ChatScreen() {
                         <div className="card-body items-center text-center">
                           {idea}
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                   <div className="text-center pt-8">
