@@ -12,15 +12,15 @@ type DispatchWithCallback<T> = (value: T, callback?: Callback<T>) => void;
 function useStateCallback<T>(
   initialState: T | (() => T)
 ): [T, DispatchWithCallback<SetStateAction<T>>] {
-  const [state, _setState] = useState(initialState);
+  const [state, setState] = useState(initialState);
 
   const callbackRef = useRef<Callback<T>>();
   const isFirstCallbackCall = useRef<boolean>(true);
 
-  const setState = useCallback(
+  const setState2 = useCallback(
     (setStateAction: SetStateAction<T>, callback?: Callback<T>): void => {
       callbackRef.current = callback;
-      _setState(setStateAction);
+      setState(setStateAction);
     },
     []
   );
@@ -33,7 +33,7 @@ function useStateCallback<T>(
     callbackRef.current?.(state);
   }, [state]);
 
-  return [state, setState];
+  return [state, setState2];
 }
 
 export default useStateCallback;

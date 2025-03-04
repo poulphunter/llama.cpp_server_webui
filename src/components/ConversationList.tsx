@@ -17,9 +17,9 @@ import {
 
 export function ConversationListDownloadDeleteButtonHeader({
   classAdd,
-}: {
+}: Readonly<{
   classAdd: string;
-}) {
+}>) {
   const { t } = useTranslation();
   const { isGenerating, viewingChat } = useAppContext();
   const isCurrConvGenerating = isGenerating(viewingChat?.conv.id ?? '');
@@ -38,21 +38,20 @@ export function ConversationListDownloadDeleteButtonHeader({
     <>
       {viewingChat && (
         <>
-          <div
+          <button
             className={classAdd + ' tooltip tooltip-bottom z-100'}
             data-tip={t('ConversationList.deleteBtn')}
             onClick={removeConversation}
+            disabled={isCurrConvGenerating}
           >
-            <button
-              role="button"
+            <div
               className="btn m-1"
-              disabled={isCurrConvGenerating}
               aria-label={t('ConversationList.deleteBtn')}
             >
               <BiX className="h-6 w-6" />
-            </button>
-          </div>
-          <div
+            </div>
+          </button>
+          <button
             className={classAdd + ' tooltip tooltip-bottom z-100'}
             data-tip={t('ConversationList.newConversation')}
             onClick={() => {
@@ -60,21 +59,20 @@ export function ConversationListDownloadDeleteButtonHeader({
               const elem = document.getElementById(
                 'toggle-conversation-list'
               ) as HTMLInputElement;
-              if (elem && elem.checked) {
+              if (elem?.checked) {
                 elem.click();
               }
             }}
           >
-            <button
-              role="button"
+            <div
               className={classNames({
                 'btn m-1 ml-4': true,
               })}
               aria-label={t('ConversationList.newConversation')}
             >
               <BiAddToQueue className="w-6 h-6" />
-            </button>
-          </div>
+            </div>
+          </button>
         </>
       )}
     </>
@@ -86,7 +84,7 @@ export function ConversationListButton() {
   return (
     <>
       {/* open sidebar button */}
-      <div
+      <button
         className="tooltip tooltip-bottom z-100"
         data-tip={t('ConversationList.conversationBtn')}
         onClick={() => {
@@ -99,7 +97,7 @@ export function ConversationListButton() {
         <label htmlFor="toggle-conversation-list" className="btn m-1 lg:hidden">
           <BiChat className="w-6 h-6" />
         </label>
-      </div>
+      </button>
       <ConversationListDownloadDeleteButtonHeader classAdd="hidden sm:block lg:hidden" />
     </>
   );
@@ -155,7 +153,7 @@ export default function ConversationList() {
       'configConvInput'
     ) as HTMLInputElement;
     let files: FileList | null = null;
-    if (inputE && inputE.files) {
+    if (inputE?.files) {
       files = inputE.files;
     } else {
       return;
@@ -186,119 +184,115 @@ export default function ConversationList() {
   };
 
   return (
-    <>
-      <div className="h-full flex flex-col max-w-64 py-4 px-4">
-        <div className="flex flex-row items-center justify-between mb-2 mt-4">
-          <h2 className="font-bold ml-4">
-            {t('ConversationList.Conversations')}
-          </h2>
-          {/* close sidebar button */}
+    <div className="h-full flex flex-col max-w-64 py-4 px-4">
+      <div className="flex flex-row items-center justify-between mb-2 mt-4">
+        <h2 className="font-bold ml-4">
+          {t('ConversationList.Conversations')}
+        </h2>
+        {/* close sidebar button */}
 
-          <div
-            className="tooltip tooltip-bottom z-100"
-            data-tip={t('ConversationList.closeBtn')}
-            onClick={() => {
-              const elem = document.getElementById('convBlock');
-              if (elem) {
-                if (elem.style.display === 'none') {
-                  elem.style.display = 'block';
-                } else {
-                  elem.style.display = 'none';
-                }
+        <button
+          className="tooltip tooltip-bottom z-100"
+          data-tip={t('ConversationList.closeBtn')}
+          onClick={() => {
+            const elem = document.getElementById('convBlock');
+            if (elem) {
+              if (elem.style.display === 'none') {
+                elem.style.display = 'block';
+              } else {
+                elem.style.display = 'none';
               }
-            }}
-          >
-            <label className="btn btn-ghost m-1 lg:hidden">
-              <BiXCircle className="w-6 h-6" />
-            </label>
-          </div>
-        </div>
+            }
+          }}
+        >
+          <label className="btn btn-ghost m-1 lg:hidden">
+            <BiXCircle className="w-6 h-6" />
+          </label>
+        </button>
+      </div>
 
-        <div className="w-full block">
-          <div className="flex flex-col items-center">
-            <span>
-              <div
-                className="tooltip tooltip-bottom z-100"
-                data-tip={t('ConversationList.resetConversationBtn')}
-                onClick={() => {
-                  clearConversations();
+      <div className="w-full block">
+        <div className="flex flex-col items-center">
+          <span>
+            <button
+              className="tooltip tooltip-bottom z-100"
+              data-tip={t('ConversationList.resetConversationBtn')}
+              onClick={() => {
+                clearConversations();
+              }}
+            >
+              <button className="btn m-1">
+                <BiReset className="w-6 h-6" />
+              </button>
+            </button>
+            <button
+              className="tooltip tooltip-bottom z-100"
+              data-tip={t('ConversationList.loadConversationBtn')}
+              onClick={() => {
+                document?.getElementById('configConvInput')?.click();
+              }}
+            >
+              <input
+                id="configConvInput"
+                className="hidden"
+                type="file"
+                onChange={() => {
+                  onConvInputChange();
                 }}
-              >
-                <button className="btn m-1">
-                  <BiReset className="w-6 h-6" />
-                </button>
+                accept=".json"
+              />
+              <button className="btn m-1">
+                <BiDownload className="h-6 w-6" />
+              </button>
+            </button>
+            <button
+              className="tooltip tooltip-bottom z-100"
+              data-tip={t('ConversationList.saveConversationBtn')}
+              onClick={() => {
+                getConversations();
+              }}
+            >
+              <div className="btn m-1">
+                <BiSave className="h-6 w-6" />
               </div>
-              <div
-                className="tooltip tooltip-bottom z-100"
-                data-tip={t('ConversationList.loadConversationBtn')}
-                onClick={() => {
-                  document?.getElementById('configConvInput')?.click();
-                }}
-              >
-                <input
-                  id="configConvInput"
-                  className="hidden"
-                  type="file"
-                  onChange={() => {
-                    onConvInputChange();
-                  }}
-                  accept=".json"
-                />
-                <button className="btn m-1">
-                  <BiDownload className="h-6 w-6" />
-                </button>
-              </div>
-              <div
-                className="tooltip tooltip-bottom z-100"
-                data-tip={t('ConversationList.saveConversationBtn')}
-                onClick={() => {
-                  getConversations();
-                }}
-              >
-                <div className="dropdown dropdown-end dropdown-bottom">
-                  <div tabIndex={0} role="button" className="btn m-1">
-                    <BiSave className="h-6 w-6" />
-                  </div>
-                </div>
-              </div>
-            </span>
-          </div>
-        </div>
-
-        <div className="w-full sm:hidden lg:block">
-          <div className="flex flex-col items-center">
-            <span>
-              <ConversationListDownloadDeleteButtonHeader classAdd="" />
-            </span>
-          </div>
-        </div>
-        {/* list of conversations */}
-        {conversations.map((conv) => (
-          <div
-            key={conv.id}
-            className={classNames({
-              'btn btn-ghost justify-start font-normal': true,
-              'btn-active': conv.id === currConv?.id,
-            })}
-            onClick={() => {
-              navigate(`/chat/${conv.id}`);
-              const elem = document.getElementById(
-                'toggle-conversation-list'
-              ) as HTMLInputElement;
-              if (elem && elem.checked) {
-                elem.click();
-              }
-            }}
-            dir="auto"
-          >
-            <span className="truncate">{conv.name}</span>
-          </div>
-        ))}
-
-        <div className="text-center text-xs opacity-40 mt-auto mx-4">
-          {t('ConversationList.convInformation')}
+            </button>
+          </span>
         </div>
       </div>
-    </>
+
+      <div className="w-full sm:hidden lg:block">
+        <div className="flex flex-col items-center">
+          <span>
+            <ConversationListDownloadDeleteButtonHeader classAdd="" />
+          </span>
+        </div>
+      </div>
+      {/* list of conversations */}
+      {conversations.map((conv) => (
+        <button
+          key={conv.id}
+          className={classNames({
+            'btn btn-ghost justify-start font-normal': true,
+            'btn-active': conv.id === currConv?.id,
+          })}
+          onClick={() => {
+            navigate(`/chat/${conv.id}`);
+            const elem = document.getElementById(
+              'toggle-conversation-list'
+            ) as HTMLInputElement;
+            if (elem?.checked) {
+              elem.click();
+            }
+          }}
+          dir="auto"
+        >
+          <span className="truncate">{conv.name}</span>
+        </button>
+      ))}
+
+      <div className="text-center text-xs opacity-40 mt-auto mx-4">
+        {t('ConversationList.convInformation')}
+      </div>
+    </div>
   );
 }

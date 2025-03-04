@@ -362,7 +362,7 @@ export default function SettingDialog() {
       'configJsonInput'
     ) as HTMLInputElement;
     let files: FileList | null = null;
-    if (inputE && inputE.files) {
+    if (inputE?.files) {
       files = inputE.files;
     } else {
       return;
@@ -373,7 +373,7 @@ export default function SettingDialog() {
     const fr = new FileReader();
     fr.onload = function (e) {
       const result = JSON.parse(e?.target?.result as string);
-      if (result && result.presets) {
+      if (result?.presets) {
         setPromptSelectConfig(result.presets, () => {
           resetSettings();
         });
@@ -469,10 +469,10 @@ export default function SettingDialog() {
         {/* Right panel, showing setting fields */}
         <div className="grow px-4">
           {SETTING_SECTIONS.map((section, idx) => (
-            <div key={idx}>
+            <div key={section.title.key + idx.toString()}>
               <div className="pt-3 pb-1">{section.title}</div>
               {section.fields.map((field, sIdx) => {
-                const key = `${idx}-${sIdx}-${field.key}-${section.title}`;
+                const key = `${idx}-${sIdx}-${field.key}-${section.title.key}`;
                 if (field.type === SettingInputType.SHORT_INPUT) {
                   return (
                     <SettingsModalShortInput

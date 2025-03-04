@@ -16,10 +16,10 @@ import { useTranslation } from 'react-i18next';
 export default function MarkdownDisplay({
   content,
   isGenerating,
-}: {
+}: Readonly<{
   content: string;
   isGenerating?: boolean;
-}) {
+}>) {
   const preprocessedContent = useMemo(
     () => preprocessLaTeX(content),
     [content]
@@ -64,9 +64,9 @@ const CodeBlockButtons: React.ElementType<
 
   const codeLanguage = useMemo(
     () =>
-      origContent
-        .substring(startOffset, startOffset + 10)
-        .match(/^```([^\n]+)\n/)?.[1] ?? '',
+      RegExp(/^```([^\n]+)\n/).exec(
+        origContent.substring(startOffset, startOffset + 10)
+      )?.[1] ?? '',
     [origContent, startOffset]
   );
 
@@ -126,19 +126,17 @@ export const RunPyCodeButton = ({
   const { setCanvasData } = useAppContext();
   const { t } = useTranslation();
   return (
-    <>
-      <button
-        className={className}
-        onClick={() =>
-          setCanvasData({
-            type: CanvasType.PY_INTERPRETER,
-            content,
-          })
-        }
-      >
-        ▶️ {t('MarkdownDisplay.Run')}
-      </button>
-    </>
+    <button
+      className={className}
+      onClick={() =>
+        setCanvasData({
+          type: CanvasType.PY_INTERPRETER,
+          content,
+        })
+      }
+    >
+      ▶️ {t('MarkdownDisplay.Run')}
+    </button>
   );
 };
 

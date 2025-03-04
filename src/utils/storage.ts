@@ -194,8 +194,8 @@ const StorageUtils = {
   async clearConversations(): Promise<void> {
     const conv = db.conversations.toArray();
     conv.then((convList) => {
-      for (let i = 0; i < convList.length; i++) {
-        const convID = convList[i].id;
+      for (const item of convList) {
+        const convID = item.id;
         this.remove(convID);
       }
     });
@@ -203,7 +203,7 @@ const StorageUtils = {
 
   // manage config
   getConfig(): typeof CONFIG_DEFAULT {
-    const savedVal = JSON.parse(localStorage.getItem('config') || '{}');
+    const savedVal = JSON.parse(localStorage.getItem('config') ?? '{}');
     // to prevent breaking changes in the future, we always provide default value for missing keys
     return {
       ...CONFIG_DEFAULT,
@@ -214,7 +214,7 @@ const StorageUtils = {
     localStorage.setItem('config', JSON.stringify(config));
   },
   getTheme(): string {
-    return localStorage.getItem('theme') || 'auto';
+    return localStorage.getItem('theme') ?? 'auto';
   },
   setTheme(theme: string) {
     if (theme === 'auto') {

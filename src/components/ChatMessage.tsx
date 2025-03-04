@@ -21,7 +21,7 @@ export default function ChatMessage({
   onEditMessage,
   onChangeSibling,
   isPending,
-}: {
+}: Readonly<{
   msg: Message | PendingMessage;
   siblingLeafNodeIds: Message['id'][];
   siblingCurrIdx: number;
@@ -30,7 +30,7 @@ export default function ChatMessage({
   onEditMessage(msg: Message, content: string): void;
   onChangeSibling(sibling: Message['id']): void;
   isPending?: boolean;
-}) {
+}>) {
   const { t } = useTranslation();
   const { viewingChat, config } = useAppContext();
   const [editingContent, setEditingContent] = useState<string | null>(null);
@@ -144,11 +144,12 @@ export default function ChatMessage({
                         <summary className="collapse-title">
                           {isPending && isThinking ? (
                             <span>
-                              <span
-                                v-if="isGenerating"
-                                className="loading loading-spinner loading-md mr-2"
-                                style={{ verticalAlign: 'middle' }}
-                              ></span>
+                              {isPending ? (
+                                <span
+                                  className="loading loading-spinner loading-md mr-2"
+                                  style={{ verticalAlign: 'middle' }}
+                                ></span>
+                              ) : null}
                               <b>{t('ChatMessage.Thinking')}</b>
                             </span>
                           ) : (
@@ -184,7 +185,7 @@ export default function ChatMessage({
                                 </div>
                               ) : // eslint-disable-next-line sonarjs/no-nested-conditional
                               extra.type === 'context' ? (
-                                <div key={extra + i.toString()}>
+                                <div key={extra.content + i.toString()}>
                                   <pre>{extra.content}</pre>
                                 </div>
                               ) : null
@@ -206,14 +207,13 @@ export default function ChatMessage({
               {/* render timings if enabled */}
               {timings && config.showTokensPerSecond && (
                 <div className="dropdown dropdown-hover dropdown-top mt-2">
-                  <div
+                  <button
                     tabIndex={0}
-                    role="button"
                     className="cursor-pointer font-semibold text-sm opacity-60"
                   >
                     {t('ChatMessage.Speed')}:{' '}
                     {timings.predicted_per_second.toFixed(1)} t/s
-                  </div>
+                  </button>
                   <div className="dropdown-content bg-base-100 z-10 w-64 p-2 shadow mt-4">
                     <b>Prompt</b>
                     <br />- {t('ChatMessage.Tokens')}: {timings.prompt_n}
