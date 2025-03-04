@@ -22,6 +22,7 @@ import {
   BiSliderAlt,
   BiXCircle,
 } from 'react-icons/bi';
+import PresetsAutocomplete from './PresetsAutocomplete.tsx';
 
 type SettKey = keyof typeof CONFIG_DEFAULT;
 
@@ -266,15 +267,8 @@ export default function SettingDialog() {
     },
   ];
 
-  const {
-    closeDropDownMenu,
-    promptSelectOptions,
-    promptSelectConfig,
-    resetSettings,
-  } = useAppContext();
-  const [selectedConfig, setSelectedConfig] = useState<number>(-1);
-  // const [sectionIdx, setSectionIdx] = useState(0);
-  // const { closeDropDownMenu } = useAppContext();
+  const { promptSelectOptions, promptSelectConfig, resetSettings } =
+    useAppContext();
 
   // clone the config object to prevent direct mutation
   const [localConfig, setLocalConfig] = useState<typeof CONFIG_DEFAULT>(
@@ -348,87 +342,7 @@ export default function SettingDialog() {
     // note: we do not perform validation here, because we may get incomplete value as user is still typing it
     setLocalConfig({ ...localConfig, [key]: value });
   };
-  const selectPrompt = (value: number) => {
-    setSelectedConfig(value);
-    if (value === -1) {
-      resetSettings();
-      return;
-    }
-    if (
-      promptSelectConfig &&
-      promptSelectConfig[value] &&
-      promptSelectConfig[value].config
-    ) {
-      const newConfig: typeof CONFIG_DEFAULT = JSON.parse(
-        JSON.stringify(CONFIG_DEFAULT)
-      );
-      // validate the config
-      for (const key in promptSelectConfig[value].config) {
-        const val =
-          promptSelectConfig[value].config[key as keyof typeof CONFIG_DEFAULT];
-        const mustBeBoolean = isBoolean(
-          CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
-        );
-        const mustBeString = isString(
-          CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
-        );
-        const mustBeNumeric = isNumeric(
-          CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
-        );
-        const mustBeArray = Array.isArray(
-          CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
-        );
-        if (mustBeString) {
-          if (!isString(val)) {
-            console.log(
-              `${t('Settings.labels.handleSave1')} ${key} ${t('Settings.labels.handleSave2')}`
-            );
-            console.log(value);
-            return;
-          }
-        } else if (mustBeNumeric) {
-          const trimmedValue = val.toString().trim();
-          const numVal = Number(trimmedValue);
-          if (isNaN(numVal) || !isNumeric(numVal) || trimmedValue.length === 0) {
-            console.log(
-              `${t('Settings.labels.handleSave1')} ${key} ${t('Settings.labels.handleSave3')}`
-            );
-            console.log(value);
-            return;
-          }
-          // force conversion to number
-          // @ts-expect-error this is safe
-          newConfig[key] = numVal;
-        } else if (mustBeBoolean) {
-          if (!isBoolean(val)) {
-            console.log(
-              `${t('Settings.labels.handleSave1')} ${key} ${t('Settings.labels.handleSave4')}`
-            );
-            console.log(value);
-            return;
-          }
-        } else if (mustBeArray) {
-          if (!Array.isArray(val)) {
-            console.log(
-              `${t('Settings.labels.handleSave1')} ${key} ${t('Settings.labels.handleSave5')}`
-            );
-            console.log(val);
-            return;
-          }
-        } else {
-          console.error(`Unknown default type for key ${key}`);
-          console.log(value);
-        }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        newConfig[key] = val;
-      }
-      if (isDev) console.log('Saving config', newConfig);
-      saveConfig(CONFIG_DEFAULT);
-      saveConfig(newConfig);
-      resetSettings();
-    }
-  };
+
   const downloadConfigs = () => {
     const configJson = JSON.stringify({ presets: promptSelectConfig }, null, 2);
     const blob = new Blob([configJson], { type: 'application/json' });
@@ -547,51 +461,8 @@ export default function SettingDialog() {
             </div>
           </div>
           {promptSelectOptions.length > 0 ? (
-            <div
-              className="tooltip tooltip-bottom z-100"
-              data-tip={t('Settings.tooltipPresets')}
-            >
-              <div className="dropdown dropdown-end dropdown-bottom">
-                <div tabIndex={0} role="button" className="btn m-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
-                    />
-                  </svg>
-                </div>
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content bg-base-300 rounded-box z-[1] w-52 p-2 shadow-2xl h-80 overflow-y-auto"
-                >
-                  {[...promptSelectOptions].map((opt) => (
-                    <li key={opt.key}>
-                      <input
-                        type="radio"
-                        name="settings"
-                        className="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                        aria-label={opt.value}
-                        value={opt.value}
-                        checked={selectedConfig === opt.key}
-                        onChange={(e) =>
-                          e.target.checked && selectPrompt(opt.key)
-                        }
-                        onClick={() => {
-                          closeDropDownMenu('');
-                        }}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <div className="">
+              <PresetsAutocomplete />
             </div>
           ) : null}
         </div>
