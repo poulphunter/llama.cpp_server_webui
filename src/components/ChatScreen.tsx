@@ -92,7 +92,6 @@ export default function ChatScreen() {
     inputRef,
     setInputMsg
   );
-  // TODO: improve this when we have "upload file" feature
   const currExtra: Message['extra'] = extraContext ? [extraContext] : undefined;
 
   // keep track of leaf node for rendering
@@ -166,7 +165,7 @@ export default function ChatScreen() {
     };
     if (automaticSend) {
       setAutomaticSend(false);
-      sendMsg();
+      sendMsg().then(() => {});
     }
   }, [
     automaticSend,
@@ -331,11 +330,12 @@ export default function ChatScreen() {
                   e.target.value + '<br/>';
               }}
               onKeyDown={(e) => {
+                // noinspection JSDeprecatedSymbols
                 if (e.nativeEvent.isComposing || e.keyCode === 229) return;
                 if (e.key === 'Enter' && e.shiftKey) return;
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  sendNewMessage();
+                  sendNewMessage().then(() => {});
                 }
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
