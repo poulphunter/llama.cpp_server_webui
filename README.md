@@ -6,7 +6,7 @@ endpoint.
 **Features:**
 
 - Mobile, medium devices and desktop UI/UX
-- Localisations (Chinese, Deutch, English, French, Italian, Spanish, Russian)
+- Localisations (Chinese, Dutch, English, French, Italian, Spanish, Russian)
 - Conversation list
   - save / edit / conversations
 - Settings tag
@@ -123,7 +123,7 @@ npm run build
 After `public/index.html.gz` has been generated we need to generate the c++
 headers (like build/examples/server/index.html.gz.hpp) that will be included
 by server.cpp. This is done by building `llama-server` as described in the
-[llama-server build](../README.md#build) section.
+[llama-server build](https://github.com/ggml-org/llama.cpp/blob/master/examples/server/README.md#build) section.
 
 Prompt and other configuration parameters are easily customisable with the json file `public/prompts.config.json` or
 through loading it in the UI.
@@ -142,7 +142,7 @@ localStorage.setItem('base', 'http://localhost:8080');
 The project is under active development, and we
 are [looking for feedback and contributors](https://github.com/ggml-org/llama.cpp/issues/4216).
 
-## Screenshoots
+## Screenshots
 
 ### Desktop / Theme
 

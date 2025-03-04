@@ -9,7 +9,7 @@ export const BASE_URL = new URL('.', document.baseURI).href
   .replace(/\/$/, '');
 
 export const CONFIG_DEFAULT = {
-  // Note: in order not to introduce breaking changes, please keep the same data type (number, string, etc) if you want to change the default value. Do not use null or undefined for default value.
+  // Note: in order not to introduce breaking changes, please keep the same data type (number, string, etc.) if you want to change the default value. Do not use null or undefined for default value.
   // Do not use nested objects, keep it single level. Prefix the key if you need to group them.
   apiKey: '',
   systemMessage: 'You are a helpful assistant.',
@@ -41,7 +41,7 @@ export const CONFIG_DEFAULT = {
   pyIntepreterEnabled: false,
   questionIdeas: [],
 };
-// config keys having numeric value (i.e. temperature, top_k, top_p, etc)
+// config keys having numeric value (i.e. temperature, top_k, top_p, etc.)
 export const CONFIG_NUMERIC_KEYS = Object.entries(CONFIG_DEFAULT)
   .filter((e) => isNumeric(e[1]))
   .map((e) => e[0]);

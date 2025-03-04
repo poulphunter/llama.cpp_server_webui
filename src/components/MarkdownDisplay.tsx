@@ -144,7 +144,7 @@ export const RunPyCodeButton = ({
 
 /**
  * This injects the "button" element before each "pre" element.
- * The actual button will be replaced with a react component in the MarkdownDisplay.
+ * The actual button will be replaced with a React component in the MarkdownDisplay.
  * We don't replace "pre" node directly because it will cause the node to re-render, which causes this bug: https://github.com/ggerganov/llama.cpp/issues/9608
  */
 function rehypeCustomCopyButton() {
