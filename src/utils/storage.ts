@@ -4,6 +4,7 @@
 import { CONFIG_DEFAULT } from '../Config';
 import { Conversation, Message, TimingReport } from './types';
 import Dexie, { Table } from 'dexie';
+import { exportDB, importInto } from 'dexie-export-import';
 
 const event = new EventTarget();
 
@@ -180,6 +181,26 @@ const StorageUtils = {
     }
     onConversationChangedHandlers = [];
   },
+  getConversations(callb: (arg0: Blob) => void): void {
+    exportDB(db).then((blob: Blob) => {
+      callb(blob);
+    });
+  },
+  setConversations(blob: Blob, thenCallback: () => void): void {
+    importInto(db, blob).then(() => {
+      thenCallback();
+    });
+  },
+  async clearConversations(): Promise<void> {
+    const conv = db.conversations.toArray();
+    conv.then((convList) => {
+      for (let i = 0; i < convList.length; i++) {
+        //db.conversations.delete(convList[i].id);
+        const convID = convList[i].id;
+        this.remove(convID);
+      }
+    });
+  },
 
   // manage config
   getConfig(): typeof CONFIG_DEFAULT {
@@ -215,12 +236,14 @@ interface LSConversation {
   lastModified: number; // timestamp from Date.now()
   messages: LSMessage[];
 }
+
 interface LSMessage {
   id: number;
   role: 'user' | 'assistant' | 'system';
   content: string;
   timings?: TimingReport;
 }
+
 async function migrationLStoIDB() {
   if (localStorage.getItem('migratedToIDB')) return;
   const res: LSConversation[] = [];

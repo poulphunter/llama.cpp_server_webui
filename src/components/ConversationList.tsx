@@ -128,10 +128,67 @@ export default function ConversationList() {
     };
   }, []);
 
+  const clearConversations = () => {
+    if (window.confirm(t('ConversationList.deletesConfirm'))) {
+      StorageUtils.clearConversations().then(() => navigate('/'));
+    }
+  };
+
+  const getConversations = () => {
+    StorageUtils.getConversations((blob: Blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `conversations.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  };
+
+  const onConvInputChange = () => {
+    const handleConversationChange = async () => {
+      setConversations(await StorageUtils.getAllConversations());
+    };
+    const inputE: HTMLInputElement = document?.getElementById(
+      'configConvInput'
+    ) as HTMLInputElement;
+    let files: FileList | null = null;
+    if (inputE && inputE.files) {
+      files = inputE.files;
+    } else {
+      return;
+    }
+    if (files.length <= 0) {
+      return false;
+    }
+    const fr = new FileReader();
+    fr.onload = function (e) {
+      if (!e) return;
+      if (!e.target) return;
+      const blob: Blob = new Blob([e.target.result as BlobPart], {
+        type: 'text/json',
+      });
+      StorageUtils.clearConversations().then(() => {
+        StorageUtils.setConversations(blob, () => {
+          console.log('Database loaded !');
+          navigate('/');
+          handleConversationChange();
+        });
+      });
+    };
+    const fItem: Blob | null = files.item(0);
+    if (fItem) {
+      fr.readAsArrayBuffer(fItem);
+    }
+    return;
+  };
+
   return (
     <>
       <div className="h-full flex flex-col max-w-64 py-4 px-4">
-        <div className="flex flex-row items-center justify-between mb-4 mt-4">
+        <div className="flex flex-row items-center justify-between mb-2 mt-4">
           <h2 className="font-bold ml-4">
             {t('ConversationList.Conversations')}
           </h2>
@@ -156,6 +213,58 @@ export default function ConversationList() {
             </label>
           </div>
         </div>
+
+        <div className="w-full block">
+          <div className="flex flex-col items-center">
+            <span>
+              <div
+                className="tooltip tooltip-bottom z-100"
+                data-tip={t('ConversationList.resetConversationBtn')}
+                onClick={() => {
+                  clearConversations();
+                }}
+              >
+                <button className="btn m-1">
+                  <BiReset className="w-6 h-6" />
+                </button>
+              </div>
+              <div
+                className="tooltip tooltip-bottom z-100"
+                data-tip={t('ConversationList.loadConversationBtn')}
+                onClick={() => {
+                  document?.getElementById('configConvInput')?.click();
+                }}
+              >
+                <input
+                  id="configConvInput"
+                  className="hidden"
+                  type="file"
+                  onChange={() => {
+                    onConvInputChange();
+                  }}
+                  accept=".json"
+                />
+                <button className="btn m-1">
+                  <BiDownload className="h-6 w-6" />
+                </button>
+              </div>
+              <div
+                className="tooltip tooltip-bottom z-100"
+                data-tip={t('ConversationList.saveConversationBtn')}
+                onClick={() => {
+                  getConversations();
+                }}
+              >
+                <div className="dropdown dropdown-end dropdown-bottom">
+                  <div tabIndex={0} role="button" className="btn m-1">
+                    <BiSave className="h-6 w-6" />
+                  </div>
+                </div>
+              </div>
+            </span>
+          </div>
+        </div>
+
         <div className="w-full sm:hidden lg:block">
           <div className="flex flex-col items-center">
             <span>
@@ -185,6 +294,7 @@ export default function ConversationList() {
             <span className="truncate">{conv.name}</span>
           </div>
         ))}
+
         <div className="text-center text-xs opacity-40 mt-auto mx-4">
           {t('ConversationList.convInformation')}
         </div>
