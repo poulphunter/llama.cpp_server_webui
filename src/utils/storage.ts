@@ -52,7 +52,7 @@ const StorageUtils = {
    * get all message nodes in a conversation
    */
   async getMessages(convId: string): Promise<Message[]> {
-    return await db.messages.where({ convId }).toArray();
+    return db.messages.where({ convId }).toArray();
   },
   /**
    * use in conjunction with getMessages to filter messages by leafNodeId

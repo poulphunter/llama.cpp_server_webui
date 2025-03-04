@@ -1,5 +1,4 @@
 import daisyuiThemes from 'daisyui/src/theming/themes';
-import { isNumeric } from './utils/misc';
 
 export const isDev = import.meta.env.MODE === 'development';
 
@@ -41,10 +40,6 @@ export const CONFIG_DEFAULT = {
   pyIntepreterEnabled: false,
   questionIdeas: [],
 };
-// config keys having numeric value (i.e. temperature, top_k, top_p, etc.)
-export const CONFIG_NUMERIC_KEYS = Object.entries(CONFIG_DEFAULT)
-  .filter((e) => isNumeric(e[1]))
-  .map((e) => e[0]);
 // list of themes supported by daisyui
 export const THEMES = ['light', 'dark']
   // make sure light & dark are always at the beginning

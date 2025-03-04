@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../utils/app.context';
 import { CONFIG_DEFAULT } from '../Config';
 import { isDev } from '../Config';
@@ -187,9 +187,9 @@ export default function SettingDialog() {
             const debugImportDemoConv = async () => {
               const res = await fetch('/demo-conversation.json');
               const demoConv = await res.json();
-              StorageUtils.remove(demoConv.id);
+              await StorageUtils.remove(demoConv.id);
               for (const msg of demoConv.messages) {
-                StorageUtils.appendMsg(demoConv.id, msg);
+                await StorageUtils.appendMsg(demoConv.id, msg);
               }
             };
             return (

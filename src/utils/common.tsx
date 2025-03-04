@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const XCloseButton: React.ElementType<
   React.ClassAttributes<HTMLButtonElement> &
     React.HTMLAttributes<HTMLButtonElement>

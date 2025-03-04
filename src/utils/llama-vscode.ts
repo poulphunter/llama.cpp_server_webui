@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MessageExtraContext } from './types';
 
 // Extra context when using llama.cpp WebUI from llama-vscode, inside an iframe

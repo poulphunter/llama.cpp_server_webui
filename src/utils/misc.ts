@@ -12,9 +12,6 @@ export const isBoolean = (x: any) => x === true || x === false;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isNumeric = (n: any) =>
   !isString(n) && !isNaN(n) && !isBoolean(n) && !Array.isArray(n);
-export const escapeAttr = (str: string) =>
-  str.replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
 // wrapper for SSE
 export async function* getSSEStreamAsync(fetchResponse: Response) {
   if (!fetchResponse.body) throw new Error('Response body is empty');
@@ -48,6 +45,7 @@ export const copyStr = (textToCopy: string) => {
     textArea.style.left = '-999999px';
     document.body.prepend(textArea);
     textArea.select();
+    // noinspection JSDeprecatedSymbols
     document.execCommand('copy');
   }
 };
@@ -96,10 +94,6 @@ export function classNames(classes: Record<string, boolean>): string {
     .map(([key, _]) => key)
     .join(' ');
 }
-
-export const delay = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
 export const throttle = <T extends unknown[]>(
   callback: (...args: T) => void,
   delay: number
