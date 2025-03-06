@@ -1,9 +1,9 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
-  useCallback,
 } from 'react';
 import {
   APIMessage,
@@ -16,11 +16,11 @@ import {
 import StorageUtils from './storage';
 import {
   filterThoughtFromMsgs,
-  normalizeMsgsForAPI,
   getSSEStreamAsync,
-  isNumeric,
   isBoolean,
+  isNumeric,
   isString,
+  normalizeMsgsForAPI,
 } from './misc';
 import { BASE_URL, CONFIG_DEFAULT, isDev } from '../Config';
 import { matchPath, useLocation, useNavigate } from 'react-router';
@@ -260,33 +260,150 @@ export const AppContextProvider = ({
 
   const isGenerating = (convId: string) => !!pendingMessages[convId];
 
-  const generateMessage = async (
+  const generateMessageInitCheck = async (
     convId: string,
-    leafNodeId: Message['id'],
-    onChunk: CallbackGeneratedChunk
-  ) => {
-    if (isGenerating(convId)) return;
-
-    const config = StorageUtils.getConfig();
+    leafNodeId: Message['id']
+  ): Promise<
+    [
+      boolean,
+      ReadonlyArray<Message> | null,
+      typeof CONFIG_DEFAULT | null,
+      AbortController | null,
+    ]
+  > => {
+    if (!isGenerating(convId)) {
+      return [false, null, null, null];
+    }
+    const config: typeof CONFIG_DEFAULT = StorageUtils.getConfig();
     const currConversation = await StorageUtils.getOneConversation(convId);
     if (!currConversation) {
       throw new Error('Current conversation is not found');
     }
-
-    const currMessages = StorageUtils.filterByLeafNodeId(
-      await StorageUtils.getMessages(convId),
-      leafNodeId,
-      false
-    );
+    const currMessages: ReadonlyArray<Message> =
+      StorageUtils.filterByLeafNodeId(
+        await StorageUtils.getMessages(convId),
+        leafNodeId,
+        false
+      );
     const abortController = new AbortController();
     setAbort(convId, abortController);
 
     if (!currMessages) {
       throw new Error('Current messages are not found');
     }
+    return [true, currMessages, config, abortController];
+  };
+
+  const generateMessagePrepareParams = (
+    config: typeof CONFIG_DEFAULT,
+    currMessages: ReadonlyArray<Message>
+  ): APIMessage[] => {
+    // prepare messages for API
+    let messages: APIMessage[] = [
+      ...(config.systemMessage.length === 0
+        ? []
+        : [{ role: 'system', content: config.systemMessage } as APIMessage]),
+      ...normalizeMsgsForAPI(currMessages),
+    ];
+    if (config.excludeThoughtOnReq) {
+      messages = filterThoughtFromMsgs(messages);
+    }
+    if (isDev) console.log({ messages });
+
+    // prepare params
+    return messages;
+  };
+
+  const generateMessageSendMessage = async (
+    config: typeof CONFIG_DEFAULT,
+    messages: APIMessage[],
+    abortController: AbortController,
+    pendingMsg: PendingMessage,
+    convId: string,
+    onChunk: CallbackGeneratedChunk
+  ): Promise<void> => {
+    const params = {
+      messages,
+      stream: true,
+      cache_prompt: true,
+      samplers: config.samplers,
+      temperature: config.temperature,
+      dynatemp_range: config.dynatemp_range,
+      dynatemp_exponent: config.dynatemp_exponent,
+      top_k: config.top_k,
+      top_p: config.top_p,
+      min_p: config.min_p,
+      typical_p: config.typical_p,
+      xtc_probability: config.xtc_probability,
+      xtc_threshold: config.xtc_threshold,
+      repeat_last_n: config.repeat_last_n,
+      repeat_penalty: config.repeat_penalty,
+      presence_penalty: config.presence_penalty,
+      frequency_penalty: config.frequency_penalty,
+      dry_multiplier: config.dry_multiplier,
+      dry_base: config.dry_base,
+      dry_allowed_length: config.dry_allowed_length,
+      dry_penalty_last_n: config.dry_penalty_last_n,
+      max_tokens: config.max_tokens,
+      timings_per_token: config.showTokensPerSecond,
+      ...(config.custom.length ? JSON.parse(config.custom) : {}),
+    };
+    // send request
+    const fetchResponse = await fetch(`${BASE_URL}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
+      },
+      body: JSON.stringify(params),
+      signal: abortController.signal,
+    });
+    if (fetchResponse.status !== 200) {
+      const body = await fetchResponse.json();
+      throw new Error(body?.error?.message || 'Unknown error');
+    }
+    const chunks = getSSEStreamAsync(fetchResponse);
+    for await (const chunk of chunks) {
+      if (chunk.error) {
+        throw new Error(chunk.error?.message || 'Unknown error');
+      }
+      const addedContent = chunk.choices[0].delta.content;
+      const lastContent = pendingMsg.content ?? '';
+      if (addedContent) {
+        pendingMsg = {
+          ...pendingMsg,
+          content: lastContent + addedContent,
+        };
+      }
+      const timings = chunk.timings;
+      if (timings && config.showTokensPerSecond) {
+        // only extract what's really needed, to save some space
+        pendingMsg.timings = {
+          prompt_n: timings.prompt_n,
+          prompt_ms: timings.prompt_ms,
+          predicted_n: timings.predicted_n,
+          predicted_ms: timings.predicted_ms,
+        };
+      }
+      setPending(convId, pendingMsg);
+      onChunk(); // don't need to switch node for pending message
+    }
+  };
+  const generateMessage = async (
+    convId: string,
+    leafNodeId: Message['id'],
+    onChunk: CallbackGeneratedChunk
+  ): Promise<void> => {
+    const check = await generateMessageInitCheck(convId, leafNodeId);
+    if (!check[0] || null == check[1] || null == check[2] || null == check[3]) {
+      return;
+    }
+    const currMessages: ReadonlyArray<Message> = check[1];
+    const config: typeof CONFIG_DEFAULT = check[2];
+    const abortController = check[3];
 
     const pendingId = Date.now() + 1;
-    let pendingMsg: PendingMessage = {
+    const pendingMsg: PendingMessage = {
       id: pendingId,
       convId,
       type: 'text',
@@ -299,88 +416,18 @@ export const AppContextProvider = ({
     setPending(convId, pendingMsg);
 
     try {
-      // prepare messages for API
-      let messages: APIMessage[] = [
-        ...(config.systemMessage.length === 0
-          ? []
-          : [{ role: 'system', content: config.systemMessage } as APIMessage]),
-        ...normalizeMsgsForAPI(currMessages),
-      ];
-      if (config.excludeThoughtOnReq) {
-        messages = filterThoughtFromMsgs(messages);
-      }
-      if (isDev) console.log({ messages });
-
-      // prepare params
-      const params = {
+      const messages: APIMessage[] = generateMessagePrepareParams(
+        config,
+        currMessages
+      );
+      await generateMessageSendMessage(
+        config,
         messages,
-        stream: true,
-        cache_prompt: true,
-        samplers: config.samplers,
-        temperature: config.temperature,
-        dynatemp_range: config.dynatemp_range,
-        dynatemp_exponent: config.dynatemp_exponent,
-        top_k: config.top_k,
-        top_p: config.top_p,
-        min_p: config.min_p,
-        typical_p: config.typical_p,
-        xtc_probability: config.xtc_probability,
-        xtc_threshold: config.xtc_threshold,
-        repeat_last_n: config.repeat_last_n,
-        repeat_penalty: config.repeat_penalty,
-        presence_penalty: config.presence_penalty,
-        frequency_penalty: config.frequency_penalty,
-        dry_multiplier: config.dry_multiplier,
-        dry_base: config.dry_base,
-        dry_allowed_length: config.dry_allowed_length,
-        dry_penalty_last_n: config.dry_penalty_last_n,
-        max_tokens: config.max_tokens,
-        timings_per_token: config.showTokensPerSecond,
-        ...(config.custom.length ? JSON.parse(config.custom) : {}),
-      };
-
-      // send request
-      const fetchResponse = await fetch(`${BASE_URL}/v1/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(config.apiKey
-            ? { Authorization: `Bearer ${config.apiKey}` }
-            : {}),
-        },
-        body: JSON.stringify(params),
-        signal: abortController.signal,
-      });
-      if (fetchResponse.status !== 200) {
-        const body = await fetchResponse.json();
-        throw new Error(body?.error?.message || 'Unknown error');
-      }
-      const chunks = getSSEStreamAsync(fetchResponse);
-      for await (const chunk of chunks) {
-        if (chunk.error) {
-          throw new Error(chunk.error?.message || 'Unknown error');
-        }
-        const addedContent = chunk.choices[0].delta.content;
-        const lastContent = pendingMsg.content ?? '';
-        if (addedContent) {
-          pendingMsg = {
-            ...pendingMsg,
-            content: lastContent + addedContent,
-          };
-        }
-        const timings = chunk.timings;
-        if (timings && config.showTokensPerSecond) {
-          // only extract what's really needed, to save some space
-          pendingMsg.timings = {
-            prompt_n: timings.prompt_n,
-            prompt_ms: timings.prompt_ms,
-            predicted_n: timings.predicted_n,
-            predicted_ms: timings.predicted_ms,
-          };
-        }
-        setPending(convId, pendingMsg);
-        onChunk(); // don't need to switch node for pending message
-      }
+        abortController,
+        pendingMsg,
+        convId,
+        onChunk
+      );
     } catch (err) {
       setPending(convId, null);
       if ((err as Error).name === 'AbortError') {
@@ -393,7 +440,6 @@ export const AppContextProvider = ({
         throw err; // rethrow
       }
     }
-
     if (pendingMsg.content !== null) {
       await StorageUtils.appendMsg(pendingMsg as Message, leafNodeId);
     }
@@ -610,7 +656,7 @@ export const AppContextProvider = ({
 
   return (
     <AppContext.Provider
-      value={{
+      value={{//NOSONAR
         canvasData,
         closeDropDownMenu,
         config,
