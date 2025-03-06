@@ -283,7 +283,8 @@ export default function ChatScreen() {
               id={'viewingChat_' + settingsSeed}
               className="grid grid-col-1 items-center text-center sm:text-left align-middle mx-auto"
             >
-              {config.questionIdeas?.length > 0 ? (
+              {config.questionIdeas?.length >= 1 &&
+              config.questionIdeas[0] != '' ? (
                 <>
                   <div className="text-center">
                     {t('ChatScreen.suggestions')}

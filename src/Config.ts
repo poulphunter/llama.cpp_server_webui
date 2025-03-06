@@ -38,7 +38,7 @@ export const CONFIG_DEFAULT = {
   custom: '', // custom json-stringified object
   // experimental features
   pyIntepreterEnabled: false,
-  questionIdeas: [],
+  questionIdeas: [''],
 };
 // list of themes supported by daisyui
 export const THEMES = ['light', 'dark']

@@ -58,10 +58,18 @@ const PresetsAutocomplete = () => {
 
   const selectPrompt = (value: number): void => {
     if (isSelectPromptOk(value)) {
-      const newConfig: typeof CONFIG_DEFAULT = JSON.parse(
-        JSON.stringify(CONFIG_DEFAULT)
-      );
-      const conf = promptSelectConfig?.[value]?.config || CONFIG_DEFAULT;
+      const conf: typeof CONFIG_DEFAULT = CONFIG_DEFAULT;
+      const prtConf: typeof CONFIG_DEFAULT | undefined =
+        promptSelectConfig?.[value]?.config;
+      if (typeof prtConf == typeof CONFIG_DEFAULT) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        Object.keys(prtConf).forEach(function (key) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          conf[key] = prtConf[key];
+        });
+      }
       // validate the config
       const isCfOk = isConfigOk(conf);
       if (isCfOk !== '') {
@@ -71,10 +79,10 @@ const PresetsAutocomplete = () => {
         return;
       }
       if (isDev) {
-        console.log('Saving config', newConfig);
+        console.log('Saving config', conf);
       }
       saveConfig(CONFIG_DEFAULT);
-      saveConfig(newConfig);
+      saveConfig(conf);
       resetSettings();
     }
   };

@@ -180,7 +180,7 @@ export const AppContextProvider = ({
   // public functions
 
   const isNumericTest = (
-    val: string | boolean | number | never[],
+    val: string | boolean | number | string[],
     conf: typeof CONFIG_DEFAULT,
     key: string
   ): boolean => {
@@ -198,7 +198,7 @@ export const AppContextProvider = ({
 
   const isConfigOk = (conf: typeof CONFIG_DEFAULT): string => {
     for (const key in conf) {
-      const val: string | boolean | number | never[] =
+      const val: string | boolean | number | string[] =
         conf[key as keyof typeof CONFIG_DEFAULT];
       const mustBeBoolean = isBoolean(
         CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
@@ -253,7 +253,7 @@ export const AppContextProvider = ({
       }
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      newConfig[key] = val;
+      conf[key] = val;
     }
     return '';
   };
