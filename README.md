@@ -10,12 +10,12 @@ trying to be more accessible for non-it people, more intuitive and easier to mai
 - Mobile, medium devices and desktop UI/UX
 - Localisations (Chinese, Dutch, English, French, Italian, Spanish, Russian)
 - Conversation list
-    - save / edit / conversations
+  - save / edit / conversations
 - Settings tag
-    - Presets
-        - automatic if config file embed in server
-        - load file (save embed file)
-        - multilingual
+  - Presets
+    - automatic if config file embed in server
+    - load file (save embed file)
+    - multilingual
 - Ideas of questions (loaded with presets)
 - [Experimental] Python interpreter (from legacy project)
 
@@ -167,4 +167,3 @@ localStorage.setItem('base', 'http://localhost:8080');
 
 llama.cpp is under active development, and they
 are [looking for feedback and contributors](https://github.com/ggml-org/llama.cpp/issues/4216).
-
