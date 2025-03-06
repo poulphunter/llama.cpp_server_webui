@@ -12,6 +12,7 @@ export const isBoolean = (x: any) => x === true || x === false;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isNumeric = (n: any) =>
   !isString(n) && !isNaN(n) && !isBoolean(n) && !Array.isArray(n);
+
 // wrapper for SSE
 export async function* getSSEStreamAsync(fetchResponse: Response) {
   if (!fetchResponse.body) throw new Error('Response body is empty');
@@ -93,6 +94,7 @@ export function classNames(classes: Record<string, boolean>): string {
     .map(([key]) => key)
     .join(' ');
 }
+
 export const throttle = <T extends unknown[]>(
   callback: (...args: T) => void,
   delay: number
@@ -111,4 +113,11 @@ export const throttle = <T extends unknown[]>(
       isWaiting = false;
     }, delay);
   };
+};
+export const cleanCurrentUrl = (removeQueryParams: string[]) => {
+  const url = new URL(window.location.href);
+  removeQueryParams.forEach((param) => {
+    url.searchParams.delete(param);
+  });
+  window.history.replaceState({}, '', url.toString());
 };
