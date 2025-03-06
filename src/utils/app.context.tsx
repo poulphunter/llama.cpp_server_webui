@@ -275,7 +275,7 @@ export const AppContextProvider = ({
       AbortController | null,
     ]
   > => {
-    if (!isGenerating(convId)) {
+    if (isGenerating(convId)) {
       return [false, null, null, null];
     }
     const config: typeof CONFIG_DEFAULT = StorageUtils.getConfig();
