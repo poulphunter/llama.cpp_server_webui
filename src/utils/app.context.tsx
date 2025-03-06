@@ -656,10 +656,12 @@ export const AppContextProvider = ({
 
   return (
     <AppContext.Provider
-      value={{//NOSONAR
+      // prettier-ignore
+      value={{ //NOSONAR
         canvasData,
         closeDropDownMenu,
         config,
+        isConfigOk,
         isGenerating,
         language,
         languageOptions,
@@ -681,7 +683,6 @@ export const AppContextProvider = ({
         settingsSeed,
         stopGenerating,
         viewingChat,
-        isConfigOk,
       }}
     >
       {children}
