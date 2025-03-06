@@ -18,11 +18,14 @@ import {
   filterThoughtFromMsgs,
   normalizeMsgsForAPI,
   getSSEStreamAsync,
+  isNumeric,
+  isBoolean,
+  isString,
 } from './misc';
 import { BASE_URL, CONFIG_DEFAULT, isDev } from '../Config';
 import { matchPath, useLocation, useNavigate } from 'react-router';
-import i18next from 'i18next';
 import useStateCallback from './UseStateCallback.tsx';
+import { useTranslation } from 'react-i18next';
 
 type languageOption = { language: string; code: string };
 
@@ -82,6 +85,7 @@ interface AppContextValue {
   ) => void;
   promptSeed: number;
   resetPromptSeed: () => void;
+  isConfigOk: (config: typeof CONFIG_DEFAULT) => string;
 }
 
 // this callback is used for scrolling to the bottom of the chat and switching to the last node
@@ -105,6 +109,7 @@ export const AppContextProvider = ({
 }: {
   children: React.ReactElement;
 }) => {
+  const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const params = matchPath('/chat/:convId', pathname);
@@ -172,6 +177,85 @@ export const AppContextProvider = ({
 
   ////////////////////////////////////////////////////////////////////////
   // public functions
+
+  const isNumericTest = (
+    val: string | boolean | number | never[],
+    conf: typeof CONFIG_DEFAULT,
+    key: string
+  ): boolean => {
+    const trimmedValue = val.toString().trim();
+    const numVal = Number(trimmedValue);
+    if (isNaN(numVal) || !isNumeric(numVal) || trimmedValue.length === 0) {
+      return false;
+    }
+    // force conversion to number
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    conf[key] = numVal;
+    return true;
+  };
+
+  const isConfigOk = (conf: typeof CONFIG_DEFAULT): string => {
+    for (const key in conf) {
+      const val: string | boolean | number | never[] =
+        conf[key as keyof typeof CONFIG_DEFAULT];
+      const mustBeBoolean = isBoolean(
+        CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
+      );
+      const mustBeString = isString(
+        CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
+      );
+      const mustBeNumeric = isNumeric(
+        CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
+      );
+      const mustBeArray = Array.isArray(
+        CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
+      );
+      if (mustBeString && !isString(val)) {
+        return (
+          t('Settings.labels.handleSave1') +
+          ' ' +
+          key +
+          ' ' +
+          t('Settings.labels.handleSave2')
+        );
+      }
+      if (mustBeNumeric && !isNumericTest(val, conf, key)) {
+        return (
+          t('Settings.labels.handleSave1') +
+          ' ' +
+          key +
+          ' ' +
+          t('Settings.labels.handleSave3')
+        );
+      }
+      if (mustBeBoolean && !isBoolean(val)) {
+        return (
+          t('Settings.labels.handleSave1') +
+          ' ' +
+          key +
+          ' ' +
+          t('Settings.labels.handleSave4')
+        );
+      }
+      if (mustBeArray && !Array.isArray(val)) {
+        return (
+          t('Settings.labels.handleSave1') +
+          ' ' +
+          key +
+          ' ' +
+          t('Settings.labels.handleSave5')
+        );
+      }
+      if (!(mustBeBoolean || mustBeNumeric || mustBeString || mustBeArray)) {
+        return `Unknown default type for key ${key}`;
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      newConfig[key] = val;
+    }
+    return '';
+  };
 
   const isGenerating = (convId: string) => !!pendingMessages[convId];
 
@@ -550,6 +634,7 @@ export const AppContextProvider = ({
         settingsSeed,
         stopGenerating,
         viewingChat,
+        isConfigOk,
       }}
     >
       {children}

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../utils/app.context';
 import { CONFIG_DEFAULT, isDev } from '../Config';
 import StorageUtils from '../utils/storage';
-import { isBoolean, isNumeric, isString } from '../utils/misc';
 import {
   BeakerIcon,
   ChatBubbleOvalLeftEllipsisIcon,
@@ -264,7 +263,7 @@ export default function SettingDialog() {
     },
   ];
 
-  const { promptSelectOptions, promptSelectConfig, resetSettings } =
+  const { promptSelectOptions, promptSelectConfig, resetSettings, isConfigOk } =
     useAppContext();
 
   // clone the config object to prevent direct mutation
@@ -287,49 +286,13 @@ export default function SettingDialog() {
     const newConfig: typeof CONFIG_DEFAULT = JSON.parse(
       JSON.stringify(localConfig)
     );
-    // validate the config
-    for (const key in newConfig) {
-      const value = localConfig[key as SettKey];
-      const mustBeBoolean = isBoolean(CONFIG_DEFAULT[key as SettKey]);
-      const mustBeString = isString(CONFIG_DEFAULT[key as SettKey]);
-      const mustBeNumeric = isNumeric(CONFIG_DEFAULT[key as SettKey]);
-      const mustBeArray = Array.isArray(CONFIG_DEFAULT[key as SettKey]);
-      if (mustBeString) {
-        if (!isString(value)) {
-          alert(
-            `${t('Settings.labels.handleSave1')} ${key} ${t('Settings.labels.handleSave2')}`
-          );
-          return;
-        }
-      } else if (mustBeNumeric) {
-        const trimmedValue = value.toString().trim();
-        const numVal = Number(trimmedValue);
-        if (isNaN(numVal) || !isNumeric(numVal) || trimmedValue.length === 0) {
-          alert(
-            `${t('Settings.labels.handleSave1')} ${key} ${t('Settings.labels.handleSave3')}`
-          );
-          return;
-        }
-        // force conversion to number
-        // @ts-expect-error this is safe
-        newConfig[key] = numVal;
-      } else if (mustBeBoolean) {
-        if (!isBoolean(value)) {
-          alert(
-            `${t('Settings.labels.handleSave1')} ${key} ${t('Settings.labels.handleSave4')}`
-          );
-          return;
-        }
-      } else if (mustBeArray) {
-        if (!Array.isArray(value)) {
-          alert(
-            `${t('Settings.labels.handleSave1')} ${key} ${t('Settings.labels.handleSave5')}`
-          );
-          return;
-        }
-      } else {
-        console.error(`Unknown default type for key ${key}`);
+    const isOk: string = isConfigOk(newConfig);
+    if (isOk != '') {
+      if (isDev) {
+        console.log(isOk);
       }
+      alert(isOk);
+      return;
     }
     if (isDev) console.log('Saving config', newConfig);
     saveConfig(newConfig);
