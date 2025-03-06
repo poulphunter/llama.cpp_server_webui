@@ -1,21 +1,23 @@
 # LLaMA.cpp Web UI
 
 The project includes a web-based user interface that enables interaction with the model through the `/chat/completions`
-endpoint.
+endpoint.  
+It's based on [llama.cpp/examples/server/webui](https://github.com/ggml-org/llama.cpp/tree/master/examples/server/webui)
+trying to be more accessible for non-it people, more intuitive and easier to maintain.
 
 **Features:**
 
 - Mobile, medium devices and desktop UI/UX
 - Localisations (Chinese, Dutch, English, French, Italian, Spanish, Russian)
 - Conversation list
-  - save / edit / conversations
+    - save / edit / conversations
 - Settings tag
-  - Presets
-    - automatic if config file embed in server
-    - load file (save embed file)
-    - multilingual
+    - Presets
+        - automatic if config file embed in server
+        - load file (save embed file)
+        - multilingual
 - Ideas of questions (loaded with presets)
-- [Experimental] Python interpreter
+- [Experimental] Python interpreter (from legacy project)
 
 ![Mobile Python Example Ask 1](doc/mobile_python_example_ask1.png 'Mobile Python Example Ask 1')
 
@@ -96,52 +98,6 @@ It will suggest `questionIdeas` when no conversation is loaded.
 All settings parameters you can change are listed in the first preset.
 If a parameter has not the right type, it won't be loaded and will be show a message in the console.
 
-## Development
-
-The web UI is developed using:
-
-- `react` framework for frontend development
-- `tailwindcss` and `daisyui` for styling
-- `vite` for build tooling
-
-A pre-built version is available as a single HTML file under `/public` directory.
-
-To build or to run the dev server (with hot reload):
-
-```sh
-# make sure you have nodejs installed
-cd examples/server/webui
-npm i
-
-# to run the dev server
-npm run dev
-
-# to build the public/index.html.gz
-npm run build
-```
-
-After `public/index.html.gz` has been generated we need to generate the c++
-headers (like build/examples/server/index.html.gz.hpp) that will be included
-by server.cpp. This is done by building `llama-server` as described in the
-[llama-server build](https://github.com/ggml-org/llama.cpp/blob/master/examples/server/README.md#build) section.
-
-Prompt and other configuration parameters are easily customisable with the json file `public/prompts.config.json` or
-through loading it in the UI.
-If you want to always load a file, you can rename `public/prompts.config.example.json` to `public/prompts.config.json`
-and it will always be loaded at application startup.
-
-Examples from https://github.com/f/awesome-chatgpt-prompts have been already written in it.
-
-NOTE: if you are using the vite dev server, you can change the API base URL to llama.cpp. To do that, run this code
-snippet in browser's console:
-
-```js
-localStorage.setItem('base', 'http://localhost:8080');
-```
-
-The project is under active development, and we
-are [looking for feedback and contributors](https://github.com/ggml-org/llama.cpp/issues/4216).
-
 ## Screenshots
 
 ### Desktop / Theme
@@ -171,3 +127,44 @@ Python interpreter for now can't use input, so we ask a new code:
 #### French translation example
 
 ![mobile_french_translation_example.png](doc/mobile_french_translation_example.png)
+
+## Development
+
+The web UI is developed using:
+
+- `react` framework for frontend development
+- `tailwindcss` and `daisyui` for styling
+- `vite` for build tooling
+- `sonar cube` for code analysis, maintainability, security
+
+To build or to run the dev server (with hot reload):
+
+```sh
+# make sure you have nodejs installed
+cd examples/server/webui
+npm i
+
+# to run the dev server
+npm run dev
+
+# to build the public/index.html.gz
+npm run build
+```
+
+Prompt and other configuration parameters are easily customisable with the json file `public/prompts.config.json` or
+through loading it in the UI.
+If you want to always load a file, you can rename `public/prompts.config.example.json` to `public/prompts.config.json`
+and it will always be loaded at application startup.
+
+Examples from https://github.com/f/awesome-chatgpt-prompts have been already written in it.
+
+NOTE: if you are using the vite dev server, you can change the API base URL to llama.cpp. To do that, run this code
+snippet in browser's console:
+
+```js
+localStorage.setItem('base', 'http://localhost:8080');
+```
+
+llama.cpp is under active development, and they
+are [looking for feedback and contributors](https://github.com/ggml-org/llama.cpp/issues/4216).
+
