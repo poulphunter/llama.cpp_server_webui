@@ -3,9 +3,14 @@ import daisyuiThemes from 'daisyui/src/theming/themes';
 export const isDev = import.meta.env.MODE === 'development';
 
 // constants
-export const BASE_URL = new URL('.', document.baseURI).href
-  .toString()
-  .replace(/\/$/, '');
+
+// h parameter can be passed through the app url to change the BASE_URL
+// ex, if the app is located at : http://localhost:5173
+// this url : http://localhost:5173/?h=https%3A%2F%2Ftest.example.com%3A8080%2Fapi
+// will configure BASE_URL as https://test.example.com:8080/api
+export const BASE_URL =
+  new URL(window.location.href).searchParams.get('h') ??
+  new URL('.', document.baseURI).href.toString().replace(/\/$/, '');
 
 export const CONFIG_DEFAULT = {
   // Note: in order not to introduce breaking changes, please keep the same data type (number, string, etc.) if you want to change the default value. Do not use null or undefined for default value.

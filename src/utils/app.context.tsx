@@ -15,6 +15,7 @@ import {
 } from './types';
 import StorageUtils from './storage';
 import {
+  cleanCurrentUrl,
   filterThoughtFromMsgs,
   getSSEStreamAsync,
   isBoolean,
@@ -110,6 +111,7 @@ export const AppContextProvider = ({
 }: {
   children: React.ReactElement;
 }) => {
+  cleanCurrentUrl(['h']);
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
