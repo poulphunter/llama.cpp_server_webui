@@ -41,19 +41,18 @@ export function ConversationListDownloadDeleteButtonHeader({
           <button
             className={classAdd + ' tooltip tooltip-bottom z-100'}
             data-tip={t('ConversationList.deleteBtn')}
+            aria-label={t('ConversationList.deleteBtn')}
             onClick={removeConversation}
             disabled={isCurrConvGenerating}
           >
-            <div
-              className="btn m-1"
-              aria-label={t('ConversationList.deleteBtn')}
-            >
+            <span className="btn m-1">
               <BiX className="h-6 w-6" />
-            </div>
+            </span>
           </button>
           <button
             className={classAdd + ' tooltip tooltip-bottom z-100'}
             data-tip={t('ConversationList.newConversation')}
+            aria-label={t('ConversationList.newConversation')}
             onClick={() => {
               navigate('/');
               const elem = document.getElementById(
@@ -64,14 +63,9 @@ export function ConversationListDownloadDeleteButtonHeader({
               }
             }}
           >
-            <div
-              className={classNames({
-                'btn m-1 ml-4': true,
-              })}
-              aria-label={t('ConversationList.newConversation')}
-            >
+            <span className={classNames({ 'btn m-1 ml-4': true })}>
               <BiAddToQueue className="w-6 h-6" />
-            </div>
+            </span>
           </button>
         </>
       )}
@@ -87,6 +81,7 @@ export function ConversationListButton() {
       <button
         className="tooltip tooltip-bottom z-100"
         data-tip={t('ConversationList.conversationBtn')}
+        aria-label={t('ConversationList.conversationBtn')}
         onClick={() => {
           const elem = document.getElementById('convBlock');
           if (elem) {
@@ -194,6 +189,7 @@ export default function ConversationList() {
         <button
           className="tooltip tooltip-bottom z-100"
           data-tip={t('ConversationList.closeBtn')}
+          aria-label={t('ConversationList.closeBtn')}
           onClick={() => {
             const elem = document.getElementById('convBlock');
             if (elem) {
@@ -205,9 +201,9 @@ export default function ConversationList() {
             }
           }}
         >
-          <label className="btn btn-ghost m-1 lg:hidden">
+          <span className="btn btn-ghost m-1 lg:hidden">
             <BiXCircle className="w-6 h-6" />
-          </label>
+          </span>
         </button>
       </div>
 
@@ -217,17 +213,19 @@ export default function ConversationList() {
             <button
               className="tooltip tooltip-bottom z-100"
               data-tip={t('ConversationList.resetConversationBtn')}
+              aria-label={t('ConversationList.resetConversationBtn')}
               onClick={() => {
                 clearConversations();
               }}
             >
-              <button className="btn m-1">
+              <span className="btn m-1">
                 <BiReset className="w-6 h-6" />
-              </button>
+              </span>
             </button>
             <button
               className="tooltip tooltip-bottom z-100"
               data-tip={t('ConversationList.loadConversationBtn')}
+              aria-label={t('ConversationList.loadConversationBtn')}
               onClick={() => {
                 document?.getElementById('configConvInput')?.click();
               }}
@@ -241,20 +239,21 @@ export default function ConversationList() {
                 }}
                 accept=".json"
               />
-              <button className="btn m-1">
+              <span className="btn m-1">
                 <BiDownload className="h-6 w-6" />
-              </button>
+              </span>
             </button>
             <button
               className="tooltip tooltip-bottom z-100"
               data-tip={t('ConversationList.saveConversationBtn')}
+              aria-label={t('ConversationList.saveConversationBtn')}
               onClick={() => {
                 getConversations();
               }}
             >
-              <div className="btn m-1">
+              <span className="btn m-1">
                 <BiSave className="h-6 w-6" />
-              </div>
+              </span>
             </button>
           </span>
         </div>
