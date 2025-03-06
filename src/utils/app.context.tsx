@@ -111,7 +111,9 @@ export const AppContextProvider = ({
 }: {
   children: React.ReactElement;
 }) => {
-  cleanCurrentUrl(['h']);
+  if (new URL(window.location.href).searchParams.has('h')) {
+    cleanCurrentUrl(['h']);
+  }
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
