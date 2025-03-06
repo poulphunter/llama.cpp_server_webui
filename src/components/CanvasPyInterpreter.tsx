@@ -138,6 +138,8 @@ export default function CanvasPyInterpreter() {
   useEffect(() => {
     setCode(canvasData?.content ?? '');
     runCode(canvasData?.content ?? '').then(() => {});
+    // no need to keep track of runCode
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canvasData?.content]);
 
   if (canvasData?.type !== CanvasType.PY_INTERPRETER) {
