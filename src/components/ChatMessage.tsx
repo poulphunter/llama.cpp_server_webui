@@ -87,11 +87,12 @@ export default function ChatMessage({
           chat: true,
           'chat-start': msg.role !== 'user',
           'chat-end': msg.role === 'user',
+          'w-full': true,
         })}
       >
         <div
           className={classNames({
-            'chat-bubble markdown': true,
+            'chat-bubble markdown w-full': true,
             'chat-bubble-base-300': msg.role !== 'user',
           })}
         >

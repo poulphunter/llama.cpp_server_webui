@@ -44,7 +44,7 @@ const SVGBlock: MarkDownBlockType = ({ node, origContent, isGenerating }) => {
   return (
     <>
       {isSVG && (
-        <div className="mb-2 mr-2 w-full max-w-2xl max-h-2xl">
+        <div className="m-1 w-[100px] h-[100px] md:w-[200px] md:h-[200px] lg:w-[300px] lg:h-[300px] lg:w-[400px] lg:h-[400px] overflow-auto">
           {convertHtmlToReact(copiedContent)}
         </div>
       )}
@@ -79,7 +79,7 @@ const HTMLBlock: MarkDownBlockType = ({ node, origContent, isGenerating }) => {
     <>
       {isHTML && (
         <iframe
-          className="mb-2 mr-2 w-full max-w-4xl max-h-4xl"
+          className="m-1 w-full min-h-[200px] md:h-[400px] lg:h-[640px] md:w-[600px] lg:w-[800px] overflow-auto"
           src={'data:text/html,' + encodeURIComponent(copiedContent)}
           title={
             // eslint-disable-next-line sonarjs/pseudo-random
