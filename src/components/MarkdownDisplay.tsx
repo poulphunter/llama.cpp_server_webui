@@ -39,7 +39,10 @@ const SVGBlock: MarkDownBlockType = ({ node, origContent, isGenerating }) => {
       )?.[1] ?? '',
     [origContent, startOffset]
   );
-  const isSVG = !isGenerating && codeLanguage.startsWith('svg');
+  const isSVG =
+    !isGenerating &&
+    (codeLanguage.startsWith('svg') ||
+      (codeLanguage.startsWith('xml') && origContent.search(/<svg /g)));
 
   return (
     <>
