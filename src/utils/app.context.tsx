@@ -323,7 +323,7 @@ export const AppContextProvider = ({
     messages: APIMessage[],
     abortController: AbortController,
     pendingMsg: PendingMessage,
-    pendingMsgUpdate:(newPM: PendingMessage) => void,
+    pendingMsgUpdate: (newPM: PendingMessage) => void,
     convId: string,
     onChunk: CallbackGeneratedChunk
   ): Promise<void> => {
@@ -419,9 +419,11 @@ export const AppContextProvider = ({
       parent: leafNodeId,
       children: [],
     };
-    const updatePendingMsg: (newPM: PendingMessage) => void = function (newPM:PendingMessage) {
+    const updatePendingMsg: (newPM: PendingMessage) => void = function (
+      newPM: PendingMessage
+    ) {
       pendingMsg = newPM;
-    }
+    };
     setPending(convId, pendingMsg);
 
     try {
