@@ -12,43 +12,90 @@ import { visit } from 'unist-util-visit';
 import { useAppContext } from '../utils/app.context';
 import { CanvasType } from '../utils/types';
 import { useTranslation } from 'react-i18next';
+import { convertHtmlToReact } from '@hedgedoc/html-to-react';
 
-export default function MarkdownDisplay({
-  content,
-  isGenerating,
-}: Readonly<{
-  content: string;
-  isGenerating?: boolean;
-}>) {
-  const preprocessedContent = useMemo(
-    () => preprocessLaTeX(content),
-    [content]
-  );
-  return (
-    <Markdown
-      remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
-      rehypePlugins={[rehypeHightlight, rehypeKatex, rehypeCustomCopyButton]}
-      components={{
-        button: (props) => (
-          <CodeBlockButtons
-            {...props}
-            isGenerating={isGenerating}
-            origContent={preprocessedContent}
-          />
-        ),
-        // note: do not use "pre", "p" or other basic html elements here, it will cause the node to re-render when the message is being generated (this should be a bug with react-markdown, not sure how to fix it)
-      }}
-    >
-      {preprocessedContent}
-    </Markdown>
-  );
-}
-
-const CodeBlockButtons: React.ElementType<
+type MarkDownBlockType = React.ElementType<
   React.ClassAttributes<HTMLButtonElement> &
     React.HTMLAttributes<HTMLButtonElement> &
     ExtraProps & { origContent: string; isGenerating?: boolean }
-> = ({ node, origContent, isGenerating }) => {
+>;
+const SVGBlock: MarkDownBlockType = ({ node, origContent, isGenerating }) => {
+  const startOffset = node?.position?.start.offset ?? 0;
+  const endOffset = node?.position?.end.offset ?? 0;
+
+  const copiedContent = useMemo(
+    () =>
+      origContent
+        .substring(startOffset, endOffset)
+        .replace(/^```[^\n]+\n/g, '')
+        .replace(/```$/g, ''),
+    [origContent, startOffset, endOffset]
+  );
+
+  const codeLanguage = useMemo(
+    () =>
+      RegExp(/^```([^\n]+)\n/).exec(
+        origContent.substring(startOffset, startOffset + 10)
+      )?.[1] ?? '',
+    [origContent, startOffset]
+  );
+  const isSVG = !isGenerating && codeLanguage.startsWith('svg');
+
+  return (
+    <>
+      {isSVG && (
+        <div className="mb-2 mr-2 w-full max-w-2xl max-h-2xl">
+          {convertHtmlToReact(copiedContent)}
+        </div>
+      )}
+    </>
+  );
+};
+const HTMLBlock: MarkDownBlockType = ({ node, origContent, isGenerating }) => {
+  const startOffset = node?.position?.start.offset ?? 0;
+  const endOffset = node?.position?.end.offset ?? 0;
+
+  const copiedContent = useMemo(
+    () =>
+      origContent
+        .substring(startOffset, endOffset)
+        .replace(/^```[^\n]+\n/g, '')
+        .replace(/```$/g, ''),
+    [origContent, startOffset, endOffset]
+  );
+
+  const codeLanguage = useMemo(
+    () =>
+      RegExp(/^```([^\n]+)\n/).exec(
+        origContent.substring(startOffset, startOffset + 10)
+      )?.[1] ?? '',
+    [origContent, startOffset]
+  );
+  const isHTML =
+    !isGenerating &&
+    (codeLanguage.startsWith('htm') || codeLanguage.startsWith('html'));
+
+  return (
+    <>
+      {isHTML && (
+        <iframe
+          className="mb-2 mr-2 w-full max-w-4xl max-h-4xl"
+          src={'data:text/html,' + encodeURIComponent(copiedContent)}
+          title={
+            // eslint-disable-next-line sonarjs/pseudo-random
+            'HTMLRender' + Math.random().toString()
+          }
+        />
+      )}
+    </>
+  );
+};
+
+const CodeBlockButtons: MarkDownBlockType = ({
+  node,
+  origContent,
+  isGenerating,
+}) => {
   const { config } = useAppContext();
   const startOffset = node?.position?.start.offset ?? 0;
   const endOffset = node?.position?.end.offset ?? 0;
@@ -139,6 +186,52 @@ export const RunPyCodeButton = ({
     </button>
   );
 };
+
+export default function MarkdownDisplay({
+  content,
+  isGenerating,
+}: Readonly<{
+  content: string;
+  isGenerating?: boolean;
+}>) {
+  const preprocessedContent = useMemo(
+    () => preprocessLaTeX(content),
+    [content]
+  );
+
+  return (
+    <Markdown
+      remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
+      rehypePlugins={[rehypeHightlight, rehypeKatex, rehypeCustomCopyButton]}
+      components={{
+        button(props) {
+          return (
+            <>
+              <SVGBlock
+                {...props}
+                isGenerating={isGenerating}
+                origContent={preprocessedContent}
+              />
+              <HTMLBlock
+                {...props}
+                isGenerating={isGenerating}
+                origContent={preprocessedContent}
+              />
+              <CodeBlockButtons
+                {...props}
+                isGenerating={isGenerating}
+                origContent={preprocessedContent}
+              />
+            </>
+          );
+        },
+        // note: do not use "pre", "p" or other basic html elements here, it will cause the node to re-render when the message is being generated (this should be a bug with react-markdown, not sure how to fix it)
+      }}
+    >
+      {preprocessedContent}
+    </Markdown>
+  );
+}
 
 /**
  * This injects the "button" element before each "pre" element.

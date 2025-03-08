@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hedgedoc/html-to-react": "^2.1.1",
     "@heroicons/react": "^2.2.0",
     "@sec-ant/readable-stream": "^0.6.0",
     "@types/hast": "^3.0.4",
