@@ -323,6 +323,7 @@ export const AppContextProvider = ({
     messages: APIMessage[],
     abortController: AbortController,
     pendingMsg: PendingMessage,
+    pendingMsgUpdate:(newPM: PendingMessage) => void,
     convId: string,
     onChunk: CallbackGeneratedChunk
   ): Promise<void> => {
@@ -378,6 +379,7 @@ export const AppContextProvider = ({
           ...pendingMsg,
           content: lastContent + addedContent,
         };
+        pendingMsgUpdate(pendingMsg);
       }
       const timings = chunk.timings;
       if (timings && config.showTokensPerSecond) {
@@ -407,7 +409,7 @@ export const AppContextProvider = ({
     const abortController = check[3];
 
     const pendingId = Date.now() + 1;
-    const pendingMsg: PendingMessage = {
+    let pendingMsg: PendingMessage = {
       id: pendingId,
       convId,
       type: 'text',
@@ -417,6 +419,9 @@ export const AppContextProvider = ({
       parent: leafNodeId,
       children: [],
     };
+    const updatePendingMsg: (newPM: PendingMessage) => void = function (newPM:PendingMessage) {
+      pendingMsg = newPM;
+    }
     setPending(convId, pendingMsg);
 
     try {
@@ -429,6 +434,7 @@ export const AppContextProvider = ({
         messages,
         abortController,
         pendingMsg,
+        updatePendingMsg,
         convId,
         onChunk
       );
