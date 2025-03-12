@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../utils/app.context';
-import { CONFIG_DEFAULT, isDev } from '../Config';
+import { CONFIG_DEFAULT } from '../Config';
 import StorageUtils from '../utils/storage';
 import {
   BeakerIcon,
@@ -13,20 +12,16 @@ import {
 import { OpenInNewTab } from '../utils/common';
 import { useTranslation } from 'react-i18next';
 import { HeaderLanguageBlock, HeaderThemeBlock } from './Header.tsx';
-import {
-  BiDownload,
-  BiReset,
-  BiSave,
-  BiSliderAlt,
-  BiXCircle,
-} from 'react-icons/bi';
-import PresetsAutocomplete from './PresetsAutocomplete.tsx';
+import { BiXCircle } from 'react-icons/bi';
+import Presets, {
+  PresetsButtonResetConfig,
+  PresetsButtonSave,
+} from './Presets.tsx';
 
 type SettKey = keyof typeof CONFIG_DEFAULT;
 
 export default function SettingDialog() {
   const { t } = useTranslation();
-  const { config, saveConfig } = useAppContext();
 
   const BASIC_KEYS: SettKey[] = [
     'temperature',
@@ -263,89 +258,13 @@ export default function SettingDialog() {
     },
   ];
 
-  const { promptSelectOptions, promptSelectConfig, resetSettings, isConfigOk } =
-    useAppContext();
-
-  // clone the config object to prevent direct mutation
-  const [localConfig, setLocalConfig] = useState<typeof CONFIG_DEFAULT>(
-    JSON.parse(JSON.stringify(config))
-  );
-  // when config is changed, reload localconfig
-  useEffect(() => {
-    setLocalConfig(config);
-  }, [config]);
-
-  const resetConfig = () => {
-    if (window.confirm(t('Settings.resetConfirm'))) {
-      setLocalConfig(CONFIG_DEFAULT);
-    }
-  };
-
-  const handleSave = () => {
-    // copy the local config to prevent direct mutation
-    const newConfig: typeof CONFIG_DEFAULT = JSON.parse(
-      JSON.stringify(localConfig)
-    );
-    const isOk: string = isConfigOk(newConfig);
-    if (isOk != '') {
-      if (isDev) {
-        console.log(isOk);
-      }
-      alert(isOk);
-      return;
-    }
-    if (isDev) console.log('Saving config', newConfig);
-    saveConfig(newConfig);
-  };
-
+  const { localConfig, saveLocalConfig } = useAppContext();
   const onChange = (key: SettKey) => (value: string | boolean) => {
     // note: we do not perform validation here, because we may get incomplete value as user is still typing it
-    setLocalConfig({ ...localConfig, [key]: value });
+    saveLocalConfig({ ...localConfig, [key]: value });
   };
 
-  const downloadConfigs = () => {
-    const configJson = JSON.stringify({ presets: promptSelectConfig }, null, 2);
-    const blob = new Blob([configJson], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `config.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const { setPromptSelectConfig, settingsSeed } = useAppContext();
-  const onFileChange = () => {
-    const inputE: HTMLInputElement = document?.getElementById(
-      'configJsonInput'
-    ) as HTMLInputElement;
-    let files: FileList | null = null;
-    if (inputE?.files) {
-      files = inputE.files;
-    } else {
-      return;
-    }
-    if (files.length <= 0) {
-      return false;
-    }
-    const fr = new FileReader();
-    fr.onload = function (e) {
-      const result = JSON.parse(e?.target?.result as string);
-      if (result?.presets) {
-        setPromptSelectConfig(result.presets, () => {
-          resetSettings();
-        });
-      }
-      console.log('JSON loaded !');
-      resetSettings();
-    };
-    const fItem: Blob | null = files.item(0);
-    if (fItem) {
-      fr.readAsText(fItem);
-    }
-  };
+  const { settingsSeed } = useAppContext();
 
   return (
     <div
@@ -388,54 +307,7 @@ export default function SettingDialog() {
         </div>
       </div>
       <div className="inline">
-        <div className="px-4 mt-4 flex">
-          <BiSliderAlt className="h-6 w-6" />
-          <div>{t('Settings.presetLabel')}</div>
-        </div>
-        <div className="block sm:flex justify-end">
-          <button
-            className="tooltip tooltip-bottom z-100"
-            data-tip={t('Settings.loadPresetBtn')}
-            onClick={() => {
-              document?.getElementById('configJsonInput')?.click();
-            }}
-            onKeyDown={() => {
-              document?.getElementById('configJsonInput')?.click();
-            }}
-          >
-            <input
-              id="configJsonInput"
-              className="hidden"
-              type="file"
-              onChange={() => {
-                onFileChange();
-              }}
-              accept=".json"
-            />
-            <div className="dropdown dropdown-end dropdown-bottom">
-              <div className="btn m-1">
-                <BiDownload className="h-6 w-6" />
-              </div>
-            </div>
-          </button>
-          <button
-            className="tooltip tooltip-bottom z-100"
-            data-tip={t('Settings.savePresetBtn')}
-            onClick={downloadConfigs}
-            onKeyDown={downloadConfigs}
-          >
-            <div className="dropdown dropdown-end dropdown-bottom">
-              <div className="btn m-1">
-                <BiSave className="h-6 w-6" />
-              </div>
-            </div>
-          </button>
-          {promptSelectOptions.length > 0 ? (
-            <div className="">
-              <PresetsAutocomplete />
-            </div>
-          ) : null}
-        </div>
+        <Presets />
       </div>
       <div className="flex flex-col">
         {/* Right panel, showing setting fields */}
@@ -496,34 +368,8 @@ export default function SettingDialog() {
         </div>
       </div>
       <div className="flex flex-row items-center justify-between mt-4 sticky bottom-0 z-10">
-        <button
-          className="tooltip tooltip-top z-100"
-          data-tip={t('Settings.resetBtn')}
-          onClick={() => {
-            resetConfig();
-          }}
-          onKeyDown={() => {
-            resetConfig();
-          }}
-        >
-          <div className="btn">
-            <BiReset className="w-6 h-6" />
-          </div>
-        </button>
-        <button
-          className="tooltip tooltip-top z-100"
-          data-tip={t('Settings.saveBtn')}
-          onClick={() => {
-            handleSave();
-          }}
-          onKeyDown={() => {
-            handleSave();
-          }}
-        >
-          <div className="btn btn-primary">
-            <BiSave className="h-6 w-6" />
-          </div>
-        </button>
+        <PresetsButtonResetConfig />
+        <PresetsButtonSave />
       </div>
     </div>
   );

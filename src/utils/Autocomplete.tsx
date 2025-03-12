@@ -2,16 +2,15 @@ import { memo, useRef, useState } from 'react';
 import { classNames } from './misc.ts';
 import { useTranslation } from 'react-i18next';
 
-type Props = {
+//we are using dropdown, input and menu component from daisyui
+const Autocomplete = (props: {
   items: string[];
   value: string;
   onChange(val: string): void;
-};
-
-//we are using dropdown, input and menu component from daisyui
-const Autocomplete = (props: Props) => {
+  onSetItem(val: string): void;
+}) => {
   const { t } = useTranslation();
-  const { items, value, onChange } = props;
+  const { items, value, onChange, onSetItem } = props;
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   return (
@@ -47,11 +46,11 @@ const Autocomplete = (props: Props) => {
               >
                 <button
                   onClick={() => {
-                    onChange(item);
+                    onSetItem(item);
                     setOpen(false);
                   }}
                   onKeyDown={() => {
-                    onChange(item);
+                    onSetItem(item);
                     setOpen(false);
                   }}
                 >

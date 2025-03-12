@@ -12,6 +12,7 @@ export const BASE_URL =
   new URL(window.location.href).searchParams.get('h') ??
   new URL('.', document.baseURI).href.toString().replace(/\/$/, '');
 
+export type CONFIG_DEFAULT_KEY = string | boolean | number | string[];
 export const CONFIG_DEFAULT = {
   // Note: in order not to introduce breaking changes, please keep the same data type (number, string, etc.) if you want to change the default value. Do not use null or undefined for default value.
   // Do not use nested objects, keep it single level. Prefix the key if you need to group them.
@@ -45,6 +46,13 @@ export const CONFIG_DEFAULT = {
   pyIntepreterEnabled: false,
   questionIdeas: [''],
 };
+export const PROMPT_JSON = [
+  {
+    name: '',
+    lang: '',
+    config: CONFIG_DEFAULT,
+  },
+];
 // list of themes supported by daisyui
 export const THEMES = ['light', 'dark']
   // make sure light & dark are always at the beginning

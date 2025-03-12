@@ -23,21 +23,19 @@ import {
   isString,
   normalizeMsgsForAPI,
 } from './misc';
-import { BASE_URL, CONFIG_DEFAULT, isDev } from '../Config';
+import {
+  BASE_URL,
+  CONFIG_DEFAULT,
+  CONFIG_DEFAULT_KEY,
+  isDev,
+  PROMPT_JSON,
+} from '../Config';
 import { matchPath, useLocation, useNavigate } from 'react-router';
 import useStateCallback from './UseStateCallback.tsx';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 
 type languageOption = { language: string; code: string };
-
-const PROMPT_JSON = [
-  {
-    name: '',
-    lang: '',
-    config: CONFIG_DEFAULT,
-  },
-];
 
 interface AppContextValue {
   // conversations and messages
@@ -67,7 +65,11 @@ interface AppContextValue {
   // config
   config: typeof CONFIG_DEFAULT;
   saveConfig: (config: typeof CONFIG_DEFAULT) => void;
+  localConfig: typeof CONFIG_DEFAULT;
+  saveLocalConfig: (config: typeof CONFIG_DEFAULT) => void;
   settingsSeed: number;
+  presetAutocompleteValue: string;
+  setPresetAutocompleteValue: (e: string) => void;
   resetSettings: () => void;
   closeDropDownMenu: (e: string) => void;
   setPromptSelectOptions: (e: { key: number; value: string }[]) => void;
@@ -87,7 +89,7 @@ interface AppContextValue {
   ) => void;
   promptSeed: number;
   resetPromptSeed: () => void;
-  isConfigOk: (config: typeof CONFIG_DEFAULT) => string;
+  isConfigOk: (config: typeof CONFIG_DEFAULT) => string | typeof CONFIG_DEFAULT;
 }
 
 // this callback is used for scrolling to the bottom of the chat and switching to the last node
@@ -127,9 +129,23 @@ export const AppContextProvider = ({
   const [aborts, setAborts] = useState<
     Record<Conversation['id'], AbortController>
   >({});
-  const [config, setConfig] = useState(StorageUtils.getConfig());
+  // main configuration, actually saved
+  const [config, setConfig] = useState<typeof CONFIG_DEFAULT>(
+    StorageUtils.getConfig()
+  );
+  // copy of config used in Settings Dialog
+  const [localConfig, setLocalConfig] = useState<typeof CONFIG_DEFAULT>(
+    JSON.parse(JSON.stringify(config))
+  );
+  // when config is changed, reload localconfig
+  useEffect(() => {
+    setLocalConfig(config);
+  }, [config]);
+
   const [canvasData, setCanvasData] = useState<CanvasData | null>(null);
   const [settingsSeed, setSettingsSeed] = useState(1);
+  const [presetAutocompleteValue, setPresetAutocompleteValue] =
+    useState<string>('');
   const [promptSeed, setPromptSeed] = useState(42);
   const resetSettings = useCallback(() => {
     // eslint-disable-next-line sonarjs/pseudo-random
@@ -183,27 +199,70 @@ export const AppContextProvider = ({
   ////////////////////////////////////////////////////////////////////////
   // public functions
 
-  const isNumericTest = (
-    val: string | boolean | number | string[],
-    conf: typeof CONFIG_DEFAULT,
-    key: string
-  ): boolean => {
+  const isNumericTest = (val: CONFIG_DEFAULT_KEY): boolean => {
     const trimmedValue = val.toString().trim();
     const numVal = Number(trimmedValue);
-    if (isNaN(numVal) || !isNumeric(numVal) || trimmedValue.length === 0) {
-      return false;
-    }
-    // force conversion to number
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    conf[key] = numVal;
-    return true;
+    return !(isNaN(numVal) || !isNumeric(numVal) || trimmedValue.length === 0);
   };
 
-  const isConfigOk = (conf: typeof CONFIG_DEFAULT): string => {
+  const mustReturn = (
+    val: CONFIG_DEFAULT_KEY,
+    key: string,
+    mustBeString: boolean,
+    mustBeNumeric: boolean,
+    mustBeBoolean: boolean,
+    mustBeArray: boolean
+  ): string => {
+    if (mustBeString && !isString(val)) {
+      return (
+        t('Settings.labels.handleSave1') +
+        ' ' +
+        key +
+        ' ' +
+        t('Settings.labels.handleSave2')
+      );
+    }
+    if (mustBeNumeric && !isNumericTest(val)) {
+      return (
+        t('Settings.labels.handleSave1') +
+        ' ' +
+        key +
+        ' ' +
+        t('Settings.labels.handleSave3')
+      );
+    }
+    if (mustBeBoolean && !isBoolean(val)) {
+      return (
+        t('Settings.labels.handleSave1') +
+        ' ' +
+        key +
+        ' ' +
+        t('Settings.labels.handleSave4')
+      );
+    }
+    if (mustBeArray && !Array.isArray(val)) {
+      return (
+        t('Settings.labels.handleSave1') +
+        ' ' +
+        key +
+        ' ' +
+        t('Settings.labels.handleSave5')
+      );
+    }
+    if (!(mustBeBoolean || mustBeNumeric || mustBeString || mustBeArray)) {
+      return `Unknown default type for key ${key}`;
+    }
+    return '';
+  };
+
+  const isConfigOk = (
+    conf: typeof CONFIG_DEFAULT
+  ): string | typeof CONFIG_DEFAULT => {
     for (const key in conf) {
-      const val: string | boolean | number | string[] =
-        conf[key as keyof typeof CONFIG_DEFAULT];
+      const val: CONFIG_DEFAULT_KEY = conf[key as keyof typeof CONFIG_DEFAULT];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      conf[key] = val;
       const mustBeBoolean = isBoolean(
         CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
       );
@@ -216,50 +275,40 @@ export const AppContextProvider = ({
       const mustBeArray = Array.isArray(
         CONFIG_DEFAULT[key as keyof typeof CONFIG_DEFAULT]
       );
-      if (mustBeString && !isString(val)) {
-        return (
-          t('Settings.labels.handleSave1') +
-          ' ' +
-          key +
-          ' ' +
-          t('Settings.labels.handleSave2')
-        );
+      const ret = mustReturn(
+        val,
+        key,
+        mustBeString,
+        mustBeNumeric,
+        mustBeBoolean,
+        mustBeArray
+      );
+      if (ret != '') {
+        return ret;
       }
-      if (mustBeNumeric && !isNumericTest(val, conf, key)) {
-        return (
-          t('Settings.labels.handleSave1') +
-          ' ' +
-          key +
-          ' ' +
-          t('Settings.labels.handleSave3')
-        );
+
+      if (mustBeNumeric && isNumericTest(val)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        conf[key] = Number(val.toString().trim());
       }
-      if (mustBeBoolean && !isBoolean(val)) {
-        return (
-          t('Settings.labels.handleSave1') +
-          ' ' +
-          key +
-          ' ' +
-          t('Settings.labels.handleSave4')
-        );
+      if (mustBeBoolean && isBoolean(val)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        conf[key] = val === true || val === 'true' || val === 1 || val === '1';
       }
-      if (mustBeArray && !Array.isArray(val)) {
-        return (
-          t('Settings.labels.handleSave1') +
-          ' ' +
-          key +
-          ' ' +
-          t('Settings.labels.handleSave5')
-        );
-      }
-      if (!(mustBeBoolean || mustBeNumeric || mustBeString || mustBeArray)) {
-        return `Unknown default type for key ${key}`;
-      }
+    }
+    // if there are some undefined keys, we complete them with CONFIG_DEFAULT model.
+    for (const key in CONFIG_DEFAULT) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      conf[key] = val;
+      if (!conf[key]) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        conf[key] = CONFIG_DEFAULT[key];
+      }
     }
-    return '';
+    return conf;
   };
 
   const isGenerating = (convId: string) => !!pendingMessages[convId];
@@ -551,6 +600,10 @@ export const AppContextProvider = ({
     setConfig(config);
   }, []);
 
+  const saveLocalConfig = useCallback((config: typeof CONFIG_DEFAULT) => {
+    setLocalConfig(config);
+  }, []);
+
   const closeDropDownMenu = (e: string) => {
     // if we specify the dropdown ID we can remove "open" attribute
     if (e !== '') {
@@ -618,12 +671,19 @@ export const AppContextProvider = ({
           language == promptSelectConfig[parseInt(key)].lang ||
           promptSelectConfig[parseInt(key)].lang == ''
         ) {
-          if (!firstConfigSet) {
+          if (!firstConfigSet && presetAutocompleteValue === '') {
             firstConfigSet = true;
             setPromptSelectFirstConfig(parseInt(key));
             saveConfig(promptSelectConfig[parseInt(key)].config);
           }
           const name = promptSelectConfig[parseInt(key)].name;
+          if (
+            presetAutocompleteValue !== '' &&
+            presetAutocompleteValue === name
+          ) {
+            setPromptSelectFirstConfig(parseInt(key));
+            saveConfig(promptSelectConfig[parseInt(key)].config);
+          }
           prt.push({ key: parseInt(key), value: name });
         }
       });
@@ -632,6 +692,9 @@ export const AppContextProvider = ({
       });
     }
     setPromptSelectOptions(prt);
+
+    // presetAutocompleteValue change must not affect this, so we remove this warning
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     promptSelectConfig,
     language,
@@ -677,7 +740,9 @@ export const AppContextProvider = ({
         isGenerating,
         language,
         languageOptions,
+        localConfig,
         pendingMessages,
+        presetAutocompleteValue,
         promptSeed,
         promptSelectConfig,
         promptSelectFirstConfig,
@@ -686,9 +751,11 @@ export const AppContextProvider = ({
         resetPromptSeed,
         resetSettings,
         saveConfig,
+        saveLocalConfig,
         sendMessage,
         setCanvasData,
         setLanguage,
+        setPresetAutocompleteValue,
         setPromptSelectConfig,
         setPromptSelectFirstConfig,
         setPromptSelectOptions,

@@ -7,31 +7,37 @@ trying to be more accessible for non-it people, more intuitive and easier to mai
 
 **Features:**
 
-- Mobile, medium devices and desktop UI/UX
 - Localisations (Chinese, Dutch, English, French, Italian, Spanish, Russian)
-- Conversation list
-  - save / edit / conversations
-- Settings tag
-  - Presets
-    - automatic if config file embed in server
-    - load file (save embed file)
-    - multilingual
+- Conversations
+  - save / load / delete all conversations, your work
+- Settings tab
+  - with Presets (multilingual)
+    - save / load / delete presets
 - Ideas of questions (loaded with presets)
+- Mobile, medium devices and desktop UI/UX
+- HTML code preview
+- SVG image preview
+- Markdown / Math render (from legacy project)
+- Languages code highlight (from legacy project)
 - [Experimental] Python interpreter (from legacy project)
 
 ![Mobile Python Example Ask 1](doc/mobile_python_example_ask1.png 'Mobile Python Example Ask 1')
 
 ## Prompt master
 
-To quickly make a change in your settings you can go to the Settings tab.
-To make change effective, click the save button in bottom right corner.
+To quickly make a change in your settings you can go to the Settings tab.  
+You can easily change the System message, the main option are just down there like temperature, top_k, top_p, etc...  
+  
+To save your preset, click on the save button on the bottom-right corner.  
+If you want to use many presets, you can enter a name in the "preset" input on the top of the settings tab.  
+Before closing your browser, you can save all your changes and load them next time.  
 
-### Json presets
+### Json presets format  
 
-If you want to configure some presets, use the json configuration file.
+If you want to manually set some presets, use the json configuration file.
 If you leave language empty, it will show in all languages.
 When loading, the first preset of the list in your language will be used.
-When you change language, presets will be reloaded using the new language.
+When you change language, presets will be reloaded using the new language if the preset input is empty.
 
 Here a full example of json presets :
 
