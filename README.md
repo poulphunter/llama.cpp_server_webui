@@ -17,6 +17,8 @@ trying to be more accessible for non-it people, more intuitive and easier to mai
 - Mobile, medium devices and desktop UI/UX
 - HTML code preview
 - SVG image preview
+- Change API URL from URL parameter (#h=https://127.0.0.1:1234)
+- Pre-input, pre-send message from URL (#m=message, #q=sendMessage)
 - Markdown / Math render (from legacy project)
 - Languages code highlight (from legacy project)
 - [Experimental] Python interpreter (from legacy project)

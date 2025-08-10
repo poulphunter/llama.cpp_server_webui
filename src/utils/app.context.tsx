@@ -15,7 +15,6 @@ import {
 } from './types';
 import StorageUtils from './storage';
 import {
-  cleanCurrentUrl,
   filterThoughtFromMsgs,
   getSSEStreamAsync,
   isBoolean,
@@ -113,9 +112,6 @@ export const AppContextProvider = ({
 }: {
   children: React.ReactElement;
 }) => {
-  if (new URL(window.location.href).searchParams.has('h')) {
-    cleanCurrentUrl(['h']);
-  }
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -636,9 +632,8 @@ export const AppContextProvider = ({
   >(null);
   const [promptSelectFirstConfig, setPromptSelectFirstConfig] =
     useState<number>(-1);
-
+  // https://swapi.dev/api/planets/1/?format=json
   useEffect(() => {
-    if (!promptSelectConfig) {
       fetch('/prompts.config.json')
         .then((response) => {
           if (!response.ok) throw new Error(response.status.toString());

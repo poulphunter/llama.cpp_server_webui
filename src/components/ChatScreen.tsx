@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { CallbackGeneratedChunk, useAppContext } from '../utils/app.context';
 import ChatMessage from './ChatMessage';
 import { CanvasType, Message, PendingMessage } from '../utils/types';
-import { classNames, cleanCurrentUrl, throttle } from '../utils/misc';
+import { classNames, throttle } from '../utils/misc';
 import CanvasPyInterpreter from './CanvasPyInterpreter';
 import StorageUtils from '../utils/storage';
 import { useVSCodeContext } from '../utils/llama-vscode';
@@ -20,20 +20,21 @@ export interface MessageDisplay {
 }
 
 /**
- * If the current URL contains "?m=...", prefill the message input with the value.
- * If the current URL contains "?q=...", prefill and SEND the message.
+ * If the current URL contains "#m=...", prefill the message input with the value.
+ * If the current URL contains "#q=...", prefill and SEND the message.
  */
+let init_message_done:boolean=false;
+let init_query_done:boolean=false;
 const prefilledMsg = {
-  content() {
-    const url = new URL(window.location.href);
-    return url.searchParams.get('m') ?? url.searchParams.get('q') ?? '';
-  },
-  shouldSend() {
-    const url = new URL(window.location.href);
-    return url.searchParams.has('q');
-  },
   clear() {
-    cleanCurrentUrl(['m', 'q']);
+    init_message_done = true;
+    init_query_done = true;
+  },
+  content: function() {
+    return init_message_done ? '' : INIT_MESSAGE;
+  },
+  shouldSend: function() {
+    return init_query_done ? '' : INIT_QUERY;
   },
 };
 
