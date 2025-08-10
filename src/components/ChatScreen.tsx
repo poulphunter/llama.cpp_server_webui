@@ -24,17 +24,20 @@ export interface MessageDisplay {
  * If the current URL contains "#m=...", prefill the message input with the value.
  * If the current URL contains "#q=...", prefill and SEND the message.
  */
-let init_message_done:boolean=false;
-let init_query_done:boolean=false;
+let init_query_done: boolean = false;
 const prefilledMsg = {
   clear() {
-    init_message_done = true;
     init_query_done = true;
   },
-  content: function() {
-    return init_message_done ? '' : INIT_MESSAGE;
+  content: function () {
+    if (init_query_done) return '';
+    if ('' === INIT_QUERY) {
+      return INIT_MESSAGE;
+    } else {
+      return INIT_QUERY;
+    }
   },
-  shouldSend: function() {
+  shouldSend: function () {
     return init_query_done ? '' : INIT_QUERY;
   },
 };

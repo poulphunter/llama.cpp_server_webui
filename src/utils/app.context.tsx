@@ -633,7 +633,10 @@ export const AppContextProvider = ({
   const [promptSelectFirstConfig, setPromptSelectFirstConfig] =
     useState<number>(-1);
   // https://swapi.dev/api/planets/1/?format=json
+
   useEffect(() => {
+    const prt: { key: number; value: string }[] = [];
+    if (!promptSelectConfig) {
       fetch('/prompts.config.json')
         .then((response) => {
           if (!response.ok) throw new Error(response.status.toString());
@@ -647,15 +650,7 @@ export const AppContextProvider = ({
         .catch((error) => {
           console.log('error: ' + error);
         });
-  }, [language,
-    setPromptSelectConfig,
-    setPromptSelectFirstConfig,
-    setPromptSelectOptions,
-    promptSelectConfig
-  ]);
-
-  useEffect(() => {
-    const prt: { key: number; value: string }[] = [];
+    }
     if (promptSelectConfig) {
       let firstConfigSet = false;
       saveConfig(CONFIG_DEFAULT);
