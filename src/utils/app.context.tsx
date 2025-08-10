@@ -647,13 +647,11 @@ export const AppContextProvider = ({
         .catch((error) => {
           console.log('error: ' + error);
         });
-    }
-  }, [
-    language,
+  }, [language,
     setPromptSelectConfig,
     setPromptSelectFirstConfig,
     setPromptSelectOptions,
-    promptSelectConfig,
+    promptSelectConfig
   ]);
 
   useEffect(() => {
