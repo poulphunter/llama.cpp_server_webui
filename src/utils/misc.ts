@@ -4,6 +4,8 @@ import { APIMessage, Message } from './types';
 
 // ponyfill for missing ReadableStream asyncIterator on Safari
 import { asyncIterator } from '@sec-ant/readable-stream/ponyfill/asyncIterator';
+import { ENCRYPT_KEY } from '../Config.ts';
+import { Crypt } from '../crypt.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isString = (x: any) => !!x.toLowerCase;
@@ -21,11 +23,17 @@ export async function* getSSEStreamAsync(fetchResponse: Response) {
     .pipeThrough(new TextLineStream());
   // @ts-expect-error asyncIterator complains about type, but it should work
   for await (const line of asyncIterator(lines)) {
-    if (line.startsWith('data:') && !line.endsWith('[DONE]')) {
-      const data = JSON.parse(line.slice(5));
+    let line2=line;
+    if (ENCRYPT_KEY!=='')
+    {
+      line2=new Crypt().decrypt(line2.replaceAll('"',''));
+      line2=line2.replaceAll("\n",'');
+    }
+    if (line2.startsWith('data:') && !line2.endsWith('[DONE]')) {
+      const data = JSON.parse(line2.slice(5));
       yield data;
-    } else if (line.startsWith('error:')) {
-      const data = JSON.parse(line.slice(6));
+    } else if (line2.startsWith('error:')) {
+      const data = JSON.parse(line2.slice(6));
       throw new Error(data.message || 'Unknown error');
     }
   }

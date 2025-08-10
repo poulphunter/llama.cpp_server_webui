@@ -21,6 +21,11 @@ export const BASE_URL:string =
   parseHashParams(window.location.hash)['h'] ??
   parseHashParams(window.location.hash)['host'] ??
   new URL('.', document.baseURI).href.toString().replace(/\/$/, '');
+
+export const ENCRYPT_KEY:string =
+  parseHashParams(window.location.hash)['k'] ??
+  parseHashParams(window.location.hash)['key'] ??
+  '';
 export const INIT_MESSAGE:string =
   parseHashParams(window.location.hash)['m'] ??
   parseHashParams(window.location.hash)['message'] ??

@@ -26,6 +26,7 @@ import {
   BASE_URL,
   CONFIG_DEFAULT,
   CONFIG_DEFAULT_KEY,
+  ENCRYPT_KEY,
   isDev,
   PROMPT_JSON,
 } from '../Config';
@@ -33,6 +34,7 @@ import { matchPath, useLocation, useNavigate } from 'react-router';
 import useStateCallback from './UseStateCallback.tsx';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
+import { Crypt } from '../crypt';
 
 type languageOption = { language: string; code: string };
 
@@ -405,7 +407,7 @@ export const AppContextProvider = ({
         'Content-Type': 'application/json',
         ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
       },
-      body: JSON.stringify(params),
+      body: ENCRYPT_KEY===''?JSON.stringify(params):JSON.stringify({message:new Crypt().encrypt(JSON.stringify(params))}),
       signal: abortController.signal,
     });
     if (fetchResponse.status !== 200) {
