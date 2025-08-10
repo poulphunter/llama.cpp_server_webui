@@ -7,6 +7,7 @@ import CanvasPyInterpreter from './CanvasPyInterpreter';
 import StorageUtils from '../utils/storage';
 import { useVSCodeContext } from '../utils/llama-vscode';
 import { useTranslation } from 'react-i18next';
+import { INIT_MESSAGE, INIT_QUERY } from '../Config.ts';
 
 /**
  * A message display is a message node with additional information for rendering.
