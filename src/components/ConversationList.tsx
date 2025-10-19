@@ -286,6 +286,22 @@ export default function ConversationList() {
           dir="auto"
         >
           <span className="truncate">{conv.name}</span>
+          <button
+            className={'tooltip tooltip-bottom z-100 ml-auto'}
+            data-tip={t('ConversationList.deleteBtn')}
+            aria-label={t('ConversationList.deleteBtn')}
+            onClick={() => {
+              const convId = conv.id;
+              if (window.confirm(t('ConversationList.deleteConfirm'))) {
+                StorageUtils.remove(convId).then(() => {});
+                navigate('/');
+              }
+            }}
+          >
+            <span className="btn">
+              <BiX className="h-6 w-6" />
+            </span>
+          </button>
         </button>
       ))}
 
