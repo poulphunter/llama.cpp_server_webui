@@ -271,7 +271,7 @@ export default function ConversationList() {
         <button
           key={conv.id}
           className={classNames({
-            'btn btn-ghost justify-start font-normal': true,
+            'relative btn btn-ghost justify-start font-normal m-0 pr-0': true,
             'btn-active': conv.id === currConv?.id,
           })}
           onClick={() => {
@@ -287,7 +287,7 @@ export default function ConversationList() {
         >
           <span className="truncate">{conv.name}</span>
           <button
-            className={'tooltip tooltip-bottom z-100 ml-auto'}
+            className={'absolute tooltip tooltip-bottom z-100 top-0 right-0'}
             data-tip={t('ConversationList.deleteBtn')}
             aria-label={t('ConversationList.deleteBtn')}
             onClick={() => {
