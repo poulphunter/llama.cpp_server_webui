@@ -23,11 +23,10 @@ export async function* getSSEStreamAsync(fetchResponse: Response) {
     .pipeThrough(new TextLineStream());
   // @ts-expect-error asyncIterator complains about type, but it should work
   for await (const line of asyncIterator(lines)) {
-    let line2=line;
-    if (ENCRYPT_KEY!=='')
-    {
-      line2=new Crypt().decrypt(line2.replaceAll('"',''));
-      line2=line2.replaceAll("\n",'');
+    let line2 = line;
+    if (ENCRYPT_KEY !== '') {
+      line2 = new Crypt().decrypt(line2.replaceAll('"', ''));
+      line2 = line2.replaceAll('\n', '');
     }
     if (line2.startsWith('data:') && !line2.endsWith('[DONE]')) {
       const data = JSON.parse(line2.slice(5));

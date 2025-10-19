@@ -9,28 +9,31 @@ export const isDev = import.meta.env.MODE === 'development';
 // this url : http://localhost:5173/?h=https%3A%2F%2Ftest.example.com%3A8080%2Fapi
 // will configure BASE_URL as https://test.example.com:8080/api
 function parseHashParams(hash: string): Record<string, string> {
-  const parameters:Record<string, string> = {};
-  hash.replace(/^#?/, '').split('&').forEach((param) => {
-    const [key, value] = param.split('=');
-    parameters[key] = decodeURIComponent(value || '');
-  });
+  const parameters: Record<string, string> = {};
+  hash
+    .replace(/^#?/, '')
+    .split('&')
+    .forEach((param) => {
+      const [key, value] = param.split('=');
+      parameters[key] = decodeURIComponent(value || '');
+    });
   return parameters;
 }
 
-export const BASE_URL:string =
+export const BASE_URL: string =
   parseHashParams(window.location.hash)['h'] ??
   parseHashParams(window.location.hash)['host'] ??
   new URL('.', document.baseURI).href.toString().replace(/\/$/, '');
 
-export const ENCRYPT_KEY:string =
+export const ENCRYPT_KEY: string =
   parseHashParams(window.location.hash)['k'] ??
   parseHashParams(window.location.hash)['key'] ??
   '';
-export const INIT_MESSAGE:string =
+export const INIT_MESSAGE: string =
   parseHashParams(window.location.hash)['m'] ??
   parseHashParams(window.location.hash)['message'] ??
   '';
-export const INIT_QUERY:string =
+export const INIT_QUERY: string =
   parseHashParams(window.location.hash)['q'] ??
   parseHashParams(window.location.hash)['query'] ??
   '';

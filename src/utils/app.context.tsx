@@ -401,15 +401,27 @@ export const AppContextProvider = ({
       ...(config.custom.length ? JSON.parse(config.custom) : {}),
     };
     // send request
-    const fetchResponse = await fetch(`${BASE_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
-      },
-      body: ENCRYPT_KEY===''?JSON.stringify(params):JSON.stringify({message:new Crypt().encrypt(JSON.stringify(params))}),
-      signal: abortController.signal,
-    });
+    const fetchResponse = await fetch(
+      import.meta.env.DEV
+        ? '/demo-conversation'
+        : `${BASE_URL}/v1/chat/completions`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(config.apiKey
+            ? { Authorization: `Bearer ${config.apiKey}` }
+            : {}),
+        },
+        body:
+          ENCRYPT_KEY === ''
+            ? JSON.stringify(params)
+            : JSON.stringify({
+                message: new Crypt().encrypt(JSON.stringify(params)),
+              }),
+        signal: abortController.signal,
+      }
+    );
     if (fetchResponse.status !== 200) {
       const body = await fetchResponse.json();
       throw new Error(body?.error?.message || 'Unknown error');

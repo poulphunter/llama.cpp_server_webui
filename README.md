@@ -28,13 +28,13 @@ trying to be more accessible for non-it people, more intuitive and easier to mai
 ## Prompt master
 
 To quickly make a change in your settings you can go to the Settings tab.  
-You can easily change the System message, the main option are just down there like temperature, top_k, top_p, etc...  
-  
+You can easily change the System message, the main option are just down there like temperature, top_k, top_p, etc...
+
 To save your preset, click on the save button on the bottom-right corner.  
 If you want to use many presets, you can enter a name in the "preset" input on the top of the settings tab.  
-Before closing your browser, you can save all your changes and load them next time.  
+Before closing your browser, you can save all your changes and load them next time.
 
-### Json presets format  
+### Json presets format
 
 If you want to manually set some presets, use the json configuration file.
 If you leave language empty, it will show in all languages.
