@@ -274,6 +274,7 @@ export default function SettingDialog() {
       <div className="flex flex-row items-center justify-between mt-4 absolute top-0 right-0 z-50">
         <button
           className="tooltip tooltip-bottom z-100"
+          aria-label={t('Settings.CloseBtn')}
           data-tip={t('Settings.CloseBtn')}
           onClick={() => {
             const elem = document.getElementById('settingBlock');

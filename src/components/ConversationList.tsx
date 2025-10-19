@@ -286,7 +286,7 @@ export default function ConversationList() {
           dir="auto"
         >
           <span className="truncate">{conv.name}</span>
-          <button
+          <span
             className={'absolute tooltip tooltip-bottom z-100 top-0 right-0'}
             data-tip={t('ConversationList.deleteBtn')}
             aria-label={t('ConversationList.deleteBtn')}
@@ -301,7 +301,7 @@ export default function ConversationList() {
             <span className="btn">
               <BiX className="h-6 w-6" />
             </span>
-          </button>
+          </span>
         </button>
       ))}
 

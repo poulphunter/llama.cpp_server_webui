@@ -91,6 +91,7 @@ export const PresetsButtonSave = () => {
   return (
     <button
       className="tooltip tooltip-top z-100"
+      aria-label={t('Settings.saveBtn')}
       data-tip={t('Settings.saveBtn')}
       onClick={() => {
         handleSave();
@@ -118,6 +119,7 @@ export const PresetsButtonResetConfig = () => {
   return (
     <button
       className="tooltip tooltip-top z-100"
+      aria-label={t('Settings.resetBtn')}
       data-tip={t('Settings.resetBtn')}
       onClick={() => {
         resetConfig();
@@ -213,6 +215,7 @@ export const Presets = () => {
       <div className="block sm:flex justify-end">
         <button
           className="tooltip tooltip-bottom z-100"
+          aria-label={t('Settings.deletePresetBtn')}
           data-tip={t('Settings.deletePresetBtn')}
           onClick={deletePresets}
           onKeyDown={deletePresets}
@@ -225,6 +228,7 @@ export const Presets = () => {
         </button>
         <button
           className="tooltip tooltip-bottom z-100"
+          aria-label={t('Settings.loadPresetBtn')}
           data-tip={t('Settings.loadPresetBtn')}
           onClick={() => {
             document?.getElementById('configJsonInput')?.click();
@@ -250,6 +254,7 @@ export const Presets = () => {
         </button>
         <button
           className="tooltip tooltip-bottom z-100"
+          aria-label={t('Settings.savePresetBtn')}
           data-tip={t('Settings.savePresetBtn')}
           onClick={downloadPresets}
           onKeyDown={downloadPresets}

@@ -44,7 +44,12 @@ function AppLayout() {
       >
         <SettingDialog />
       </div>
-      <button type="button" id="dropdown-close-helper" className="h-0 w-0" />
+      <button
+        type="button"
+        aria-label="Close helper, not visible button"
+        id="dropdown-close-helper"
+        className="h-0 w-0"
+      />
     </div>
   );
 }

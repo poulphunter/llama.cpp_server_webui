@@ -402,9 +402,7 @@ export const AppContextProvider = ({
     };
     // send request
     const fetchResponse = await fetch(
-      import.meta.env.DEV
-        ? '/demo-conversation'
-        : `${BASE_URL}/v1/chat/completions`,
+      isDev ? '/demo-conversation' : `${BASE_URL}/v1/chat/completions`,
       {
         method: 'POST',
         headers: {

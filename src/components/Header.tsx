@@ -29,6 +29,7 @@ export function HeaderThemeBlock({ id }: Readonly<{ id: string }>) {
   return (
     <div
       className="tooltip tooltip-bottom z-100"
+      aria-label={t('Header.tooltipTheme')}
       data-tip={t('Header.tooltipTheme')}
     >
       <div id={id} className="dropdown dropdown-end dropdown-bottom">
@@ -73,6 +74,7 @@ export function HeaderLanguageBlock({ id }: Readonly<{ id: string }>) {
   return (
     <div
       className="tooltip tooltip-bottom z-100"
+      aria-label={t('Header.tooltipLanguage')}
       data-tip={t('Header.tooltipLanguage')}
     >
       <div id={id} className="dropdown dropdown-end dropdown-bottom">
@@ -118,6 +120,7 @@ export default function Header() {
       <div className="flex items-center">
         <button
           className="hidden xl:block tooltip tooltip-bottom z-100"
+          aria-label={t('Header.tooltipSettings')}
           data-tip={t('Header.tooltipSettings')}
           onClick={() => {
             const elem = document.getElementById('settingBlock');
@@ -133,6 +136,7 @@ export default function Header() {
         </button>
         <button
           className="xl:hidden tooltip tooltip-bottom z-100"
+          aria-label={t('Header.tooltipSettings')}
           data-tip={t('Header.tooltipSettings')}
           onClick={() => {
             const elem = document.getElementById('settingBlock');
