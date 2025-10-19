@@ -11,7 +11,7 @@ export default tseslint.config(
   tseslint.configs.recommended,
   sonarjs.configs.recommended,
   {
-    ignores: ['dist'],
+    ignores: ['dist','test-results','playwright-report'],
   },
   {
     files: ['**/*.{ts,tsx}'],
