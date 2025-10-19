@@ -43,7 +43,7 @@ export const CONFIG_DEFAULT = {
   systemMessage: 'You are a helpful assistant.',
   showTokensPerSecond: false,
   showThoughtInProgress: false,
-  excludeThoughtOnReq: true,
+  excludeThoughtOnReq: false,
   // make sure these default values are in sync with `common.h`
   samplers: 'edkypmxt',
   temperature: 0.8,
